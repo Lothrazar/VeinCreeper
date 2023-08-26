@@ -1,5 +1,10 @@
 package com.lothrazar.veincreeper.entity;
 
+import java.util.HashMap;
+import java.util.Map;
+import com.lothrazar.veincreeper.ConfigManager;
+import com.lothrazar.veincreeper.CreepType;
+import com.lothrazar.veincreeper.PartyCreeperRegistry;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.Util;
@@ -18,16 +23,11 @@ import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class ExplosionParty extends Explosion {
 
@@ -78,12 +78,20 @@ public class ExplosionParty extends Explosion {
           this.level.getProfiler().push("explosion_blocks");
           //overrides
           boolean replaced = false;
-          if (blockstate.is(Blocks.STONE) || blockstate.is(Blocks.DIRT) || blockstate.is(Blocks.ICE)) {
-            //TODO: dynamic ore
-            toReplace.put(blockpos, Blocks.COAL_ORE.defaultBlockState());
-            replaced = true;
-            //set replaced=true to skip destruction
+          final String key = ConfigManager.getKeyFromEntity(this.getExploder());
+          if (PartyCreeperRegistry.CREEPERS.containsKey(key)) {
+            //
+            CreepType creeper = PartyCreeperRegistry.CREEPERS.get(key);
+            if (blockstate.is(creeper.getReplace())) {
+              //TODO: dynamic ore
+              System.out.println("YES replace ore " + key);
+              toReplace.put(blockpos, creeper.getOre().defaultBlockState());
+              replaced = true;
+              //set replaced=true to skip destruction
+            }
           }
+          else
+            System.out.println("ERROR! no valid oreconfigs found for mob " + key);
           //
           if (!replaced && blockstate.canDropFromExplosion(this.level, blockpos, this)) {
             if (this.level instanceof ServerLevel serverlevel) {

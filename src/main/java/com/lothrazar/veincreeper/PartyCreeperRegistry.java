@@ -32,7 +32,8 @@ public class PartyCreeperRegistry {
   @SubscribeEvent
   public static void onRegistry(RegisterEvent event) {
     event.register(Registries.ENTITY_TYPE, reg -> {
-      for (CreepType type : ConfigManager.getMobs()) {
+      ConfigManager.parseConfig();
+      for (CreepType type : CREEPERS.values()) {
         createCreeper(reg, type);
       }
       //      createCreeper(reg, "party_coal");
@@ -42,7 +43,6 @@ public class PartyCreeperRegistry {
 
   private static void createCreeper(RegisterHelper<EntityType<?>> reg, CreepType type) {
     type.setEntityType(BUILDER.build(type.getId()));
-    CREEPERS.put(type.getId(), type);
     reg.register(type.getId(), type.getEntityType());
   }
 

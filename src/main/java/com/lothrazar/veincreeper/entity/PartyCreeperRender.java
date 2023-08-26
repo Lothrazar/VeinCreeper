@@ -1,7 +1,6 @@
 package com.lothrazar.veincreeper.entity;
 
-import com.lothrazar.veincreeper.CreepType;
-import com.lothrazar.veincreeper.PartyCreeperRegistry;
+import com.lothrazar.veincreeper.ConfigManager;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -20,11 +19,31 @@ public class PartyCreeperRender extends CreeperRenderer {
   @Override
   public ResourceLocation getTextureLocation(Creeper entity) {
     if (((PartyCreeperModel) this.model).color == null) {
-      for (CreepType type : PartyCreeperRegistry.CREEPERS.values()) {
-        if (entity.getType() == type.getEntityType()) {
-          ((PartyCreeperModel) this.model).color = type.getColor();
-        }
-      }
+      final String key = ConfigManager.getKeyFromEntity(entity);
+      System.out.println("Found color for type " + key);
+      ((PartyCreeperModel) this.model).color = ConfigManager.getCreeperColor(key);
+      //      for (CreepType type : PartyCreeperRegistry.CREEPERS.values()) {
+      //        if (entity.getType() == type.getEntityType()) {
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          System.out.println("Found color for type " + entity.getType().getDescriptionId());
+      //          ((PartyCreeperModel) this.model).color = type.getColor();
+      //        }
+      //      }
     }
     return super.getTextureLocation(entity);
   }
