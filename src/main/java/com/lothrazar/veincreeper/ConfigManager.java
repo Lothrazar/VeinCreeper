@@ -22,9 +22,16 @@ public class ConfigManager extends ConfigTemplate {
   public static ConfigValue<List<String>> ENTITIES;
   //default entities
   private static final List<String> DFLT = Arrays.asList(new String[] {
-      "coal_creeper,255,0,0,minecraft:stone_ore_replaceables,minecraft:coal_ore",
-      "iron_creeper,0,0,255,minecraft:stone_ore_replaceables,minecraft:iron_ore",
-      "diamond_creeper,0,255,0,minecraft:stone_ore_replaceables,minecraft:diamond_ore"
+      //TODO: minecraft:deepslate_ore_replaceables
+      "coal_creeper,40,20,20,minecraft:stone_ore_replaceables,minecraft:coal_ore",
+      "iron_creeper,130,60,20,minecraft:stone_ore_replaceables,minecraft:iron_ore",
+      "diamond_creeper,0,120,200,minecraft:stone_ore_replaceables,minecraft:diamond_ore",
+      "copper_creeper,200,90,0,minecraft:stone_ore_replaceables,minecraft:copper_ore",
+      "gold_creeper,240,240,0,minecraft:stone_ore_replaceables,minecraft:gold_ore", //nether variant
+      "redstone_creeper,235,35,0,minecraft:stone_ore_replaceables,minecraft:redstone_ore",
+      "lapis_creeper,0,0,255,minecraft:stone_ore_replaceables,minecraft:lapis_ore",
+      "emerald_creeper,0,255,0,minecraft:stone_ore_replaceables,minecraft:emerald_ore"
+      //quartz? (nether)
   });
   static {
     initConfig();

@@ -2,6 +2,7 @@ package com.lothrazar.veincreeper;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -21,6 +22,7 @@ public class VeinCreeperMod {
     PartyCreeperRegistry.ITEMS.register(bus);
     bus.addListener(this::setup);
     bus.addListener(this::setupClient);
+    MinecraftForge.EVENT_BUS.register(new CreeperCmd());
   }
 
   private void setup(final FMLCommonSetupEvent event) {

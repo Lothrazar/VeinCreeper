@@ -11,6 +11,8 @@ import net.minecraft.world.entity.monster.Creeper;
 
 public class PartyCreeperRender extends CreeperRenderer {
 
+  public static boolean doRefresh = false;
+
   public PartyCreeperRender(EntityRendererProvider.Context ctx) {
     super(ctx);
     this.model = new PartyCreeperModel<>(ctx.bakeLayer(ModelLayers.CREEPER));
@@ -18,7 +20,8 @@ public class PartyCreeperRender extends CreeperRenderer {
 
   @Override
   public ResourceLocation getTextureLocation(Creeper entity) {
-    if (((PartyCreeperModel) this.model).color == null) {
+    if (((PartyCreeperModel) this.model).color == null
+        || doRefresh) {
       final String key = ConfigManager.getKeyFromEntity(entity);
       ((PartyCreeperModel) this.model).color = ConfigManager.getCreeperColor(key);
     }
