@@ -32,12 +32,11 @@ public class PartyCreeperRegistry {
   @SubscribeEvent
   public static void onRegistry(RegisterEvent event) {
     event.register(Registries.ENTITY_TYPE, reg -> {
+      //TODO: parse/refresh config from that one event
       ConfigManager.parseConfig();
       for (CreepType type : CREEPERS.values()) {
         createCreeper(reg, type);
       }
-      //      createCreeper(reg, "party_coal");
-      //      createCreeper(reg, "party_iron"); 
     });
   }
 

@@ -4,10 +4,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import com.lothrazar.library.config.ConfigTemplate;
+import com.lothrazar.veincreeper.entity.PartyCreeper;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
@@ -48,8 +51,6 @@ public class ConfigManager extends ConfigTemplate {
       try {
         String id = arr[0];
         int[] color = new int[] { Integer.parseInt(arr[1]), Integer.parseInt(arr[2]), Integer.parseInt(arr[3]) };
-        System.out.println("Test tag key " + arr[4]);
-        System.out.println("Test BLOCK key " + arr[5]);
         TagKey<Block> replaceMe = TagKey.create(Registries.BLOCK, new ResourceLocation(arr[4]));
         Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(arr[5]));
         PartyCreeperRegistry.CREEPERS.put(id, new CreepType(arr[0], color, replaceMe, ore));
@@ -64,19 +65,21 @@ public class ConfigManager extends ConfigTemplate {
     if (PartyCreeperRegistry.CREEPERS.containsKey(key)) {
       return PartyCreeperRegistry.CREEPERS.get(key).getColor();
     }
-    //    for (String line : ENTITIES.get()) {
-    //      String[] arr = line.split(",");
-    //      String id = arr[0];
-    //      if (id.equals(key))
-    //        return new int[] { Integer.parseInt(arr[1]), Integer.parseInt(arr[2]), Integer.parseInt(arr[3]) };
-    //    }
-    //random default
-    System.out.println("ERROR! no color found for mob " + key);
+    VeinCreeperMod.LOGGER.error("ERROR! no color found for mob " + key);
     return new int[] { 200, 0, 0 };
   }
 
   public static String getKeyFromEntity(Entity entity) {
     final String key = entity.getType().getDescriptionId().replace("entity.veincreeper.", "");
     return key;
+  }
+
+  public static Component getDisplayName(PartyCreeper partyCreeper) {
+    for (var creeper : PartyCreeperRegistry.CREEPERS.values()) {
+      if (creeper.getEntityType() == partyCreeper.getType()) {
+        return creeper.getOre().getName().append(" ").append(EntityType.CREEPER.getDescription());
+      }
+    }
+    return null;
   }
 }

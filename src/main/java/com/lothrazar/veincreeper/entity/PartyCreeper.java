@@ -1,5 +1,7 @@
 package com.lothrazar.veincreeper.entity;
 
+import com.lothrazar.veincreeper.ConfigManager;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Creeper;
@@ -12,6 +14,12 @@ public class PartyCreeper extends Creeper {
 
   public PartyCreeper(EntityType<PartyCreeper> t, Level level) {
     super(t, level);
+  }
+
+  @Override
+  public Component getDisplayName() {
+    return ConfigManager.getDisplayName(this);
+    //    return super.getDisplayName();
   }
 
   @Override

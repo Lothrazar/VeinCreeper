@@ -23,7 +23,6 @@ public class PartyCreeperModel<T extends Entity> extends CreeperModel<T> {
       super.renderToBuffer(ps, vc, l, overlay, color[0] / 255F, color[1] / 255F, color[2] / 255F, a);
     }
     else {
-      System.out.println("INVALID color " + this.color);
       super.renderToBuffer(ps, vc, l, overlay, r, g, b, a);
     }
   }

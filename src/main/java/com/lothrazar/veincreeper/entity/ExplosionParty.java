@@ -5,6 +5,7 @@ import java.util.Map;
 import com.lothrazar.veincreeper.ConfigManager;
 import com.lothrazar.veincreeper.CreepType;
 import com.lothrazar.veincreeper.PartyCreeperRegistry;
+import com.lothrazar.veincreeper.VeinCreeperMod;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.Util;
@@ -83,15 +84,14 @@ public class ExplosionParty extends Explosion {
             //
             CreepType creeper = PartyCreeperRegistry.CREEPERS.get(key);
             if (blockstate.is(creeper.getReplace())) {
-              //TODO: dynamic ore
-              System.out.println("YES replace ore " + key);
+              //TODO: dynamic ore 
               toReplace.put(blockpos, creeper.getOre().defaultBlockState());
               replaced = true;
               //set replaced=true to skip destruction
             }
           }
           else
-            System.out.println("ERROR! no valid oreconfigs found for mob " + key);
+            VeinCreeperMod.LOGGER.error("ERROR! no valid oreconfigs found for mob " + key);
           //
           if (!replaced && blockstate.canDropFromExplosion(this.level, blockpos, this)) {
             if (this.level instanceof ServerLevel serverlevel) {
