@@ -116,12 +116,8 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-  flatDir { dir 'libs' } 
-  maven {
-    // location of the maven that hosts JEI files
-    name = "Progwml6 maven"
-    url = 'https://dvs1.progwml6.com/files/maven/'
-  }
+  // flatDir { dir 'libs' } 
+
   maven {
   	name = "curios"
     url = 'https://maven.theillusivec4.top/'
@@ -146,17 +142,17 @@ dependencies {
      //optional integrations
 
      
-     compileOnly fg.deobf("vazkii.patchouli:Patchouli:${minecraft_version}-${patchouli_version}-FORGE:api")
-     runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${minecraft_version}-${patchouli_version}-FORGE")
+   //  compileOnly fg.deobf("vazkii.patchouli:Patchouli:${minecraft_version}-${patchouli_version}-FORGE:api")
+  //   runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${minecraft_version}-${patchouli_version}-FORGE")
      
      compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
      compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
      runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
 
-     runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
-     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
+  //   runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
+  //   compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
  
-   implementation fg.deobf("com.blamejared.crafttweaker:CraftTweaker-forge-${minecraft_version}:${crafttweaker_version}")
+  implementation fg.deobf("com.blamejared.crafttweaker:CraftTweaker-forge-${minecraft_version}:${crafttweaker_version}")
 
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${minecraft_version}-${coolmod_version}.jar

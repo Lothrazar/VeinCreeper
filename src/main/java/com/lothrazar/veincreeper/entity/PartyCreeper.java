@@ -1,4 +1,5 @@
-package com.lothrazar.veincreeper;
+package com.lothrazar.veincreeper.entity;
+
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Creeper;
@@ -13,31 +14,23 @@ public class PartyCreeper extends Creeper {
     super(t, level);
   }
 
-
-
   @Override
   public void explodeCreeper() {
-
     if (!this.level().isClientSide) {
-      float  radius = this.isPowered() ? 2.0F : 1.0F+1; // hardcoded large size
+      float radius = this.isPowered() ? 2.0F : 1.0F + 1; // hardcoded large size
       this.dead = true;
-
-
       var interactionVal = this.level().getGameRules().getBoolean(GameRules.RULE_MOB_EXPLOSION_DROP_DECAY) ? Explosion.BlockInteraction.DESTROY_WITH_DECAY : Explosion.BlockInteraction.DESTROY;
       boolean fire = false;
       //start of level.explode
-      ExplosionParty explosion = new ExplosionParty(this.level(), this, (DamageSource)null, (ExplosionDamageCalculator)null, this.getX(), this.getY(), this.getZ(), radius,fire,
+      ExplosionParty explosion = new ExplosionParty(this.level(), this, (DamageSource) null, (ExplosionDamageCalculator) null, this.getX(), this.getY(), this.getZ(), radius, fire,
           interactionVal);
       if (!net.minecraftforge.event.ForgeEventFactory.onExplosionStart(this.level(), explosion)) { // returns true if cancelled
-
         explosion.explode();
         explosion.finalizeExplosion(true);
       }
       //end of level.explode
       this.discard();
       this.spawnLingeringCloud();
-
     }
-
   }
 }
