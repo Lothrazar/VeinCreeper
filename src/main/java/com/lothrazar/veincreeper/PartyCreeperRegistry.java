@@ -27,7 +27,7 @@ public class PartyCreeperRegistry {
   public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, VeinCreeperMod.MODID);
   //
   static Builder<PartyCreeper> BUILDER = EntityType.Builder.<PartyCreeper> of(PartyCreeper::new, MobCategory.MISC).sized(1.4F, 2.7F - 0.3F).clientTrackingRange(10);
-  static Map<String, CreepType> CREEPERS = new HashMap<>();
+  public static Map<String, CreepType> CREEPERS = new HashMap<>();
 
   @SubscribeEvent
   public static void onRegistry(RegisterEvent event) {
