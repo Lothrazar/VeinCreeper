@@ -15,7 +15,8 @@ public class PartyCreeperModel<T extends Entity> extends CreeperModel<T> {
     //overlay is used when explosion is happening
     g=0;
     b=0;
-    System.out.println(String.format("creep render %s, %s, %s ;; alpha = %s",r,g,b,a));
+    //TODO: from property
+  //  //(String.format("creep render %s, %s, %s ;; alpha = %s",r,g,b,a));
     super.renderToBuffer(ps, vc, l, overlay, r, g, b, a);
   }
 }

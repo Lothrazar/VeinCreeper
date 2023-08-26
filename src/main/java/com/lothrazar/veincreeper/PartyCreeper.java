@@ -19,15 +19,21 @@ public class PartyCreeper extends Creeper {
   public void explodeCreeper() {
 
     if (!this.level().isClientSide) {
-      float  radius = this.isPowered() ? 2.0F : 1.0F;
+      float  radius = this.isPowered() ? 2.0F : 1.0F+1; // hardcoded large size
       this.dead = true;
 
-      ExplosionParty explosion = new ExplosionParty(this.level(), this, (DamageSource)null, (ExplosionDamageCalculator)null, this.getX(), this.getY(), this.getZ(), radius,true, Explosion.BlockInteraction.KEEP);
-      if (!net.minecraftforge.event.ForgeEventFactory.onExplosionStart(this.level(), explosion)) {
+
+      var interactionVal = this.level().getGameRules().getBoolean(GameRules.RULE_MOB_EXPLOSION_DROP_DECAY) ? Explosion.BlockInteraction.DESTROY_WITH_DECAY : Explosion.BlockInteraction.DESTROY;
+      boolean fire = false;
+      //start of level.explode
+      ExplosionParty explosion = new ExplosionParty(this.level(), this, (DamageSource)null, (ExplosionDamageCalculator)null, this.getX(), this.getY(), this.getZ(), radius,fire,
+          interactionVal);
+      if (!net.minecraftforge.event.ForgeEventFactory.onExplosionStart(this.level(), explosion)) { // returns true if cancelled
 
         explosion.explode();
         explosion.finalizeExplosion(true);
       }
+      //end of level.explode
       this.discard();
       this.spawnLingeringCloud();
 
