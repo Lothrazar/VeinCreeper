@@ -5,6 +5,7 @@ import java.util.Map;
 import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
 import com.lothrazar.veincreeper.conf.CreeperConfigManager;
+import com.lothrazar.veincreeper.entity.VeinCreeper;
 import com.lothrazar.veincreeper.recipe.ExplosionRecipe;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -81,27 +82,33 @@ public class ExplosionOres extends Explosion {
           final String key = CreeperConfigManager.getKeyFromEntity(this.getExploder());
           if (CreeperRegistry.CREEPERS.containsKey(key)) {
             //itsa valid entity, so NOW check recipe
+            boolean recipeFound = false;
             for (ExplosionRecipe recipe : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.RECIPE.get())) {
-              if (recipe.getEntityType().equals(key) && blockstate.is(recipe.getReplace())) {
-                //do it
-                toReplace.put(blockpos, recipe.getOreOutput().defaultBlockState());
-                VeinCreeperMod.LOGGER.info("Explosion recipe applied to world " + recipe.getId());
+              if (recipe.getEntityType().equals(key) && blockstate.is(recipe.getReplace())
+                  && recipe.getOreOutput() != null) {
+                recipeFound = true;
+                //BONUS? or normal
+                if (recipe.getBonus() != null && recipe.getBonusChance() > 0
+                    && (recipe.getBonusChance() / 100F) < level.random.nextDouble()) {
+                  //ok
+                  toReplace.put(blockpos, recipe.getBonus().defaultBlockState());
+                  VeinCreeperMod.LOGGER.info("Explosion recipe applied BONUS " + recipe.getId());
+                }
+                else {
+                  //default to always replace to non-bonus
+                  toReplace.put(blockpos, recipe.getOreOutput().defaultBlockState());
+                  VeinCreeperMod.LOGGER.info("Explosion recipe applied to world " + recipe.getId());
+                }
                 replaced = true;
-                break; // found a matching recipe for this block state
+                break; // found a matching recipe for this block state, AND did a replacement
               }
             }
-            //
-            //
-            //            CreepType creeper = PartyCreeperRegistry.CREEPERS.get(key);
-            //            if (blockstate.is(creeper.getReplace())) {
-            //              //TODO: dynamic ore 
-            //              toReplace.put(blockpos, creeper.getOre().defaultBlockState());
-            //              replaced = true;
-            //              //set replaced=true to skip destruction
-            //            }
+            if (!recipeFound && this.getExploder() instanceof VeinCreeper) {
+              VeinCreeperMod.LOGGER.error("No recipe found for vein crreper. Make sure to create your own recipes when creepers are added to the config " + this.getExploder().getType());
+            }
           }
-          else
-            VeinCreeperMod.LOGGER.error("ERROR! no valid oreconfigs found for mob " + key);
+          //          else
+          //            VeinCreeperMod.LOGGER.error("ERROR! no valid oreconfigs found for mob " + key);
           //
           if (!replaced && blockstate.canDropFromExplosion(this.level, blockpos, this)) {
             if (this.level instanceof ServerLevel serverlevel) {

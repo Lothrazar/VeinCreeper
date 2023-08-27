@@ -24,13 +24,22 @@ public class ExplosionRecipe implements Recipe<Container> {
   private TagKey<Block> replace = BlockTags.STONE_ORE_REPLACEABLES;
   private Block oreOutput = null; // Blocks.COAL_ORE;
   private String entityType;
+  private Block bonus = null;
+  private float bonusChance = 0;
 
-  public ExplosionRecipe(ResourceLocation id, TagKey<Block> input, Block result, String entityType) {
+  public ExplosionRecipe(ResourceLocation id, TagKey<Block> input, Block result, String entityType,
+      Block bonus, float chance) {
     super();
     this.id = id;
     this.replace = input;
     this.oreOutput = result;
     this.entityType = entityType;
+    this.bonus = bonus;
+    this.bonusChance = chance;
+  }
+
+  public ExplosionRecipe(ResourceLocation id, TagKey<Block> input, Block result, String entityType) {
+    this(id, input, result, entityType, null, 0);
   }
 
   @Override
@@ -92,6 +101,22 @@ public class ExplosionRecipe implements Recipe<Container> {
     this.replace = replace;
   }
 
+  public Block getBonus() {
+    return bonus;
+  }
+
+  public void setBonus(Block bonus) {
+    this.bonus = bonus;
+  }
+
+  public float getBonusChance() {
+    return bonusChance;
+  }
+
+  public void setBonusChance(float bonusChance) {
+    this.bonusChance = bonusChance;
+  }
+
   public static class SerializePartyRecipe implements RecipeSerializer<ExplosionRecipe> {
 
     public SerializePartyRecipe() {}
@@ -106,10 +131,19 @@ public class ExplosionRecipe implements Recipe<Container> {
         String target = json.get("target").getAsJsonObject().get("tag").getAsString();
         TagKey<Block> targetMe = TagKey.create(Registries.BLOCK, new ResourceLocation(target));
         String entity = json.get(VeinCreeperMod.MODID).getAsString();
-        String blockId = json.get("ore").getAsJsonObject().get("block").getAsString();
+        JsonObject oreJson = json.get("ore").getAsJsonObject();
+        String blockId = oreJson.get("block").getAsString();
         Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockId));
+        Block bonus = null;
+        float bonusChance = 0;
+        if (oreJson.has("bonus") && oreJson.has("bonusChance")) {
+          // optional bonus
+          String bonusId = oreJson.get("bonus").getAsString();
+          bonus = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(bonusId));
+          bonusChance = oreJson.get("bonusChance").getAsFloat();
+        }
         VeinCreeperMod.LOGGER.debug("SUCCESS loading recipe  " + recipeId);
-        return new ExplosionRecipe(recipeId, targetMe, ore, entity);
+        return new ExplosionRecipe(recipeId, targetMe, ore, entity, bonus, bonusChance);
       }
       catch (Exception e) {
         VeinCreeperMod.LOGGER.error("Error loading recipe  " + recipeId, e);

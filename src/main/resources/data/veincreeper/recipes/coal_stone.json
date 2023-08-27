@@ -5,7 +5,9 @@
 		"tag": "minecraft:stone_ore_replaceables"
 	},
 	"ore": {
-		"block": "minecraft:coal_ore"
+		"block": "minecraft:coal_ore",
+		"bonus": "minecraft:coal_block",
+		"bonusChance": 15.0
 	},
 	"conditions": [
 		{

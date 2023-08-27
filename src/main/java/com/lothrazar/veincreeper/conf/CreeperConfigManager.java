@@ -18,17 +18,15 @@ public class CreeperConfigManager extends ConfigTemplate {
   public static ConfigValue<List<? extends String>> ENTITIES;
   //default entities
   private static final List<String> DFLT = Arrays.asList(new String[] {
-      //TODO: minecraft:deepslate_ore_replaceables  | minecraft:deepslate_coal_ore 
       "coal_creeper,40,20,20,150,Coal,false",
       "iron_creeper,130,60,20,200,Iron,true",
       "diamond_creeper,0,120,200,255,Diamond,false",
       "copper_creeper,200,90,0,200,Copper,true",
-      "gold_creeper,240,240,0,200,Gold,true", //nether variant
+      "gold_creeper,240,240,0,200,Gold,true",
       "redstone_creeper,235,35,0,255,Redstone,true",
       "lapis_creeper,0,0,255,240,Lapis,true",
-      "emerald_creeper,0,255,0,255,Emerald,false"
-      //quartz? (nether)
-  });
+      "emerald_creeper,0,255,0,255,Emerald,false",
+      "quartz_creeper,255,255,255,255,Emerald,false" });
   static {
     initConfig();
   }

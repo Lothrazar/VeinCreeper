@@ -5,7 +5,9 @@
 		"tag": "minecraft:deepslate_ore_replaceables"
 	},
 	"ore": {
-		"block": "minecraft:deepslate_emerald_ore"
+		"block": "minecraft:deepslate_emerald_ore",
+		"bonus": "minecraft:emerald_block",
+		"bonusChance": 15.0
 	},
 	"conditions": [
 		{

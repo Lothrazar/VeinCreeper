@@ -1,7 +1,7 @@
 package com.lothrazar.veincreeper.entity;
 
-import com.lothrazar.veincreeper.conf.CreeperConfigManager;
 import com.lothrazar.veincreeper.conf.CreepType;
+import com.lothrazar.veincreeper.conf.CreeperConfigManager;
 import com.lothrazar.veincreeper.explosion.ExplosionOres;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
@@ -34,7 +34,7 @@ public class VeinCreeper extends Creeper {
   @Override
   public void explodeCreeper() {
     if (!this.level().isClientSide) {
-      float radius = this.isPowered() ? 2.0F : 1.0F + 1; //TODO config? hardcoded large size
+      float radius = 2.8F; //this.isPowered() ? 2.0F : 1.0F + 1; //TODO config? hardcoded large size
       this.dead = true;
       var interactionVal = this.level().getGameRules().getBoolean(GameRules.RULE_MOB_EXPLOSION_DROP_DECAY) ? Explosion.BlockInteraction.DESTROY_WITH_DECAY : Explosion.BlockInteraction.DESTROY;
       boolean fire = false;

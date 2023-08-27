@@ -1,0 +1,16 @@
+{
+	"type": "veincreeper:explosion",
+	"veincreeper": "lapis_creeper",
+	"target": {
+		"tag": "minecraft:deepslate_ore_replaceables"
+	},
+	"ore": {
+		"block": "minecraft:deepslate_lapis_ore"
+	},
+	"conditions": [
+		{
+			"type": "flib:entity_exists",
+			"value": "veincreeper:lapis_creeper"
+		}
+	]
+}
