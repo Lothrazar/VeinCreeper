@@ -85,6 +85,7 @@ public class ExplosionOres extends Explosion {
               if (recipe.getEntityType().equals(key) && blockstate.is(recipe.getReplace())) {
                 //do it
                 toReplace.put(blockpos, recipe.getOreOutput().defaultBlockState());
+                VeinCreeperMod.LOGGER.info("Explosion recipe applied to world " + recipe.getId());
                 replaced = true;
                 break; // found a matching recipe for this block state
               }
