@@ -1,0 +1,111 @@
+package com.lothrazar.veincreeper.recipe;
+
+import com.google.gson.JsonObject;
+import com.lothrazar.veincreeper.PartyCreeperRegistry;
+import com.lothrazar.veincreeper.VeinCreeperMod;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
+
+public class ExplosionRecipe implements Recipe<Container> {
+
+  private final ResourceLocation id;
+  private Ingredient replace = null; // TagKey<Block>   BlockTags.STONE_ORE_REPLACEABLES;
+  private Block oreOutput = null; // Blocks.COAL_ORE;
+  private String entityType;
+
+  public ExplosionRecipe(ResourceLocation id, Ingredient input, Block result, String entityType) {
+    super();
+    this.id = id;
+    this.replace = input;
+    this.oreOutput = result;
+    this.entityType = entityType;
+  }
+
+  @Override
+  public boolean matches(Container c, Level level) {
+    return false; //never match any container
+  }
+
+  @Override
+  public ItemStack assemble(Container c, RegistryAccess level) {
+    return getResultItem(level);
+  }
+
+  @Override
+  public boolean canCraftInDimensions(int x, int y) {
+    return true;
+  }
+
+  @Override
+  public ItemStack getResultItem(RegistryAccess level) {
+    return new ItemStack(oreOutput);
+  }
+
+  @Override
+  public ResourceLocation getId() {
+    return id;
+  }
+
+  @Override
+  public RecipeType<?> getType() {
+    return PartyCreeperRegistry.RECIPE.get();
+  }
+
+  @Override
+  public RecipeSerializer<?> getSerializer() {
+    return PartyCreeperRegistry.R_SERIALIZER.get();
+  }
+
+  public static class SerializePartyRecipe implements RecipeSerializer<ExplosionRecipe> {
+
+    public SerializePartyRecipe() {}
+
+    @Override
+    public ExplosionRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+      try {
+        Ingredient target = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "target"));
+        String entity = json.get(VeinCreeperMod.MODID).getAsString();
+        String blockId = json.get("ore").getAsJsonObject().get("block").getAsString();
+        Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockId));
+        //        Ingredient inputFirst = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
+        //        ItemStack resultStack = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
+        VeinCreeperMod.LOGGER.error("SUCCESS loading recipe" + recipeId);
+        return new ExplosionRecipe(recipeId, target, ore, entity);
+      }
+      catch (Exception e) {
+        VeinCreeperMod.LOGGER.error("Error loading recipe" + recipeId, e);
+        return null;
+      }
+    }
+
+    @Override
+    public ExplosionRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+      var input = Ingredient.fromNetwork(buffer);
+      var block = buffer.readResourceLocation();
+      var entity = buffer.readUtf();
+      ExplosionRecipe r = new ExplosionRecipe(recipeId, input, ForgeRegistries.BLOCKS.getValue(block), entity);
+      //server reading recipe from client or vice/versa 
+      return r;
+    }
+
+    @Override
+    public void toNetwork(FriendlyByteBuf buffer, ExplosionRecipe recipe) {
+      // replace, block, entity
+      recipe.replace.toNetwork(buffer);
+      var key = ForgeRegistries.BLOCKS.getKey(recipe.oreOutput);
+      buffer.writeResourceLocation(key);
+      buffer.writeUtf(recipe.entityType);
+    }
+  }
+}

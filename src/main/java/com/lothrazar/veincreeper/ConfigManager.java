@@ -22,8 +22,8 @@ public class ConfigManager extends ConfigTemplate {
   public static ConfigValue<List<String>> ENTITIES;
   //default entities
   private static final List<String> DFLT = Arrays.asList(new String[] {
-      //TODO: minecraft:deepslate_ore_replaceables
-      "coal_creeper,40,20,20,minecraft:stone_ore_replaceables,minecraft:coal_ore",
+      //TODO: minecraft:deepslate_ore_replaceables  | minecraft:deepslate_coal_ore 
+      "coal_creeper,40,20,20,minecraft:deepslate_ore_replaceables,minecraft:coal_ore",
       "iron_creeper,130,60,20,minecraft:stone_ore_replaceables,minecraft:iron_ore",
       "diamond_creeper,0,120,200,minecraft:stone_ore_replaceables,minecraft:diamond_ore",
       "copper_creeper,200,90,0,minecraft:stone_ore_replaceables,minecraft:copper_ore",
@@ -58,8 +58,10 @@ public class ConfigManager extends ConfigTemplate {
       try {
         String id = arr[0];
         int[] color = new int[] { Integer.parseInt(arr[1]), Integer.parseInt(arr[2]), Integer.parseInt(arr[3]) };
-        TagKey<Block> replaceMe = TagKey.create(Registries.BLOCK, new ResourceLocation(arr[4]));
-        Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(arr[5]));
+        String strTags = arr[4];
+        TagKey<Block> replaceMe = TagKey.create(Registries.BLOCK, new ResourceLocation(strTags));
+        String strBlock = arr[5];
+        Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(strBlock));
         PartyCreeperRegistry.CREEPERS.put(id, new CreepType(arr[0], color, replaceMe, ore));
       }
       catch (Exception e) {

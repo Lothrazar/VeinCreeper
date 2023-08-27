@@ -18,8 +18,8 @@ public class VeinCreeperMod {
   public VeinCreeperMod() {
     new ConfigManager();
     IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-    PartyCreeperRegistry.BLOCKS.register(bus);
-    PartyCreeperRegistry.ITEMS.register(bus);
+    PartyCreeperRegistry.RECIPE_SERIALIZERS.register(bus);
+    PartyCreeperRegistry.RECIPE_TYPES.register(bus);
     bus.addListener(this::setup);
     bus.addListener(this::setupClient);
     MinecraftForge.EVENT_BUS.register(new CreeperCmd());
