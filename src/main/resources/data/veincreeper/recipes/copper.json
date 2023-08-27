@@ -6,5 +6,11 @@
 	},
 	"ore": {
 		"block": "minecraft:copper_ore"
-	}
+	},
+	"conditions": [
+		{
+			"type": "flib:entity_exists",
+			"value": "veincreeper:copper_creeper"
+		}
+	]
 }

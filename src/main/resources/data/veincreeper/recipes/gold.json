@@ -6,5 +6,11 @@
 	},
 	"ore": {
 		"block": "minecraft:gold_ore"
-	}
+	},
+	"conditions": [
+		{
+			"type": "flib:entity_exists",
+			"value": "veincreeper:gold_creeper"
+		}
+	]
 }

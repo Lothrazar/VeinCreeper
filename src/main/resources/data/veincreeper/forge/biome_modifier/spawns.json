@@ -1,19 +1,31 @@
 {
   "type": "forge:add_spawns",
-  "biomes":   "#minecraft:beach",
-  "_config":"TODO: how to link this to yaml config? ",
+  "biomes":   "#minecraft:is_overworld",
+
   "spawners": [
+    {
+      "type": "veincreeper:dirt_creeper",
+      "maxCount": 5,
+      "minCount": 2,
+      "weight": 99
+    },
     {
       "type": "veincreeper:copper_creeper",
       "maxCount": 5,
       "minCount": 2,
-      "weight": 12
+      "weight": 99
     },
     {
       "type": "veincreeper:iron_creeper",
       "maxCount": 4,
       "minCount": 2,
       "weight": 8
+    },
+    {
+      "type": "veincreeper:diamond_creeper",
+      "maxCount": 4,
+      "minCount": 2,
+      "weight": 99
     }
   ]
 }

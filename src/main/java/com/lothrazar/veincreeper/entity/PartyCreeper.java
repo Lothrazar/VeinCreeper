@@ -18,15 +18,19 @@ public class PartyCreeper extends Creeper {
   }
 
   @Override
+  public boolean shouldDropExperience() {
+    return true;
+  }
+
+  @Override
   public Component getDisplayName() {
     return ConfigManager.getDisplayName(this);
-    //    return super.getDisplayName();
   }
 
   @Override
   public void explodeCreeper() {
     if (!this.level().isClientSide) {
-      float radius = this.isPowered() ? 2.0F : 1.0F + 1; // hardcoded large size
+      float radius = this.isPowered() ? 2.0F : 1.0F + 1; //TODO config? hardcoded large size
       this.dead = true;
       var interactionVal = this.level().getGameRules().getBoolean(GameRules.RULE_MOB_EXPLOSION_DROP_DECAY) ? Explosion.BlockInteraction.DESTROY_WITH_DECAY : Explosion.BlockInteraction.DESTROY;
       boolean fire = false;

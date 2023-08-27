@@ -6,5 +6,11 @@
 	},
 	"ore": {
 		"block": "minecraft:iron_ore"
-	}
+	},
+	"conditions": [
+		{
+			"type": "flib:entity_exists",
+			"value": "veincreeper:iron_creeper"
+		}
+	]
 }

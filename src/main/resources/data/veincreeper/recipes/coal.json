@@ -6,5 +6,11 @@
 	},
 	"ore": {
 		"block": "minecraft:coal_ore"
-	}
+	},
+	"conditions": [
+		{
+			"type": "flib:entity_exists",
+			"value": "veincreeper:coal_creeper"
+		}
+	]
 }

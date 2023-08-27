@@ -6,5 +6,11 @@
 	},
 	"ore": {
 		"block": "minecraft:emerald_ore"
-	}
+	},
+	"conditions": [
+		{
+			"type": "flib:entity_exists",
+			"value": "veincreeper:emerald_creeper"
+		}
+	]
 }
