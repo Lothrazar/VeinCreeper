@@ -73,7 +73,6 @@ public class ExplosionParty extends Explosion {
       Util.shuffle(this.toBlow, this.level.random);
       for (BlockPos blockpos : this.toBlow) {
         BlockState blockstate = this.level.getBlockState(blockpos);
-        //        Block block = blockstate.getBlock();
         if (!blockstate.isAir()) {
           BlockPos blockpos1 = blockpos.immutable();
           this.level.getProfiler().push("explosion_blocks");
@@ -83,11 +82,11 @@ public class ExplosionParty extends Explosion {
           if (PartyCreeperRegistry.CREEPERS.containsKey(key)) {
             //itsa valid entity, so NOW check recipe
             for (ExplosionRecipe recipe : level.getRecipeManager().getAllRecipesFor(PartyCreeperRegistry.RECIPE.get())) {
-              if (recipe.getEntityType().equals(key)
-                  && blockstate.is(recipe.getReplace())) {
+              if (recipe.getEntityType().equals(key) && blockstate.is(recipe.getReplace())) {
                 //do it
                 toReplace.put(blockpos, recipe.getOreOutput().defaultBlockState());
                 replaced = true;
+                break; // found a matching recipe for this block state
               }
             }
             //

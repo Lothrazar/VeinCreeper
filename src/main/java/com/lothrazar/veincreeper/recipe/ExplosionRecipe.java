@@ -104,11 +104,11 @@ public class ExplosionRecipe implements Recipe<Container> {
         String entity = json.get(VeinCreeperMod.MODID).getAsString();
         String blockId = json.get("ore").getAsJsonObject().get("block").getAsString();
         Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockId));
-        VeinCreeperMod.LOGGER.error("SUCCESS loading recipe" + recipeId);
+        VeinCreeperMod.LOGGER.error("SUCCESS loading recipe  " + recipeId);
         return new ExplosionRecipe(recipeId, targetMe, ore, entity);
       }
       catch (Exception e) {
-        VeinCreeperMod.LOGGER.error("Error loading recipe" + recipeId, e);
+        VeinCreeperMod.LOGGER.error("Error loading recipe  " + recipeId, e);
         return null;
       }
     }

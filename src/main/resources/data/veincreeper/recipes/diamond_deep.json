@@ -1,0 +1,10 @@
+{
+	"type": "veincreeper:explosion",
+	"veincreeper": "diamond_creeper",
+	"target": {
+		"tag": "minecraft:deepslate_ore_replaceables"
+	},
+	"ore": {
+		"block": "minecraft:deepslate_diamond_ore"
+	}
+}

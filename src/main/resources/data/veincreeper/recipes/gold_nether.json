@@ -1,0 +1,10 @@
+{
+	"type": "veincreeper:explosion",
+	"veincreeper": "gold_creeper",
+	"target": {
+		"tag": "forge:netherrack"
+	},
+	"ore": {
+		"block": "minecraft:nether_gold_ore"
+	}
+}
