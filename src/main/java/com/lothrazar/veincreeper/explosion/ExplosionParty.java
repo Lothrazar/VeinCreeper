@@ -1,11 +1,11 @@
-package com.lothrazar.veincreeper.entity;
+package com.lothrazar.veincreeper.explosion;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.lothrazar.veincreeper.ConfigManager;
-import com.lothrazar.veincreeper.CreepType;
 import com.lothrazar.veincreeper.PartyCreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
+import com.lothrazar.veincreeper.conf.ConfigManager;
+import com.lothrazar.veincreeper.recipe.ExplosionRecipe;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.Util;
@@ -73,7 +73,7 @@ public class ExplosionParty extends Explosion {
       Util.shuffle(this.toBlow, this.level.random);
       for (BlockPos blockpos : this.toBlow) {
         BlockState blockstate = this.level.getBlockState(blockpos);
-        Block block = blockstate.getBlock();
+        //        Block block = blockstate.getBlock();
         if (!blockstate.isAir()) {
           BlockPos blockpos1 = blockpos.immutable();
           this.level.getProfiler().push("explosion_blocks");
@@ -81,14 +81,24 @@ public class ExplosionParty extends Explosion {
           boolean replaced = false;
           final String key = ConfigManager.getKeyFromEntity(this.getExploder());
           if (PartyCreeperRegistry.CREEPERS.containsKey(key)) {
-            //
-            CreepType creeper = PartyCreeperRegistry.CREEPERS.get(key);
-            if (blockstate.is(creeper.getReplace())) {
-              //TODO: dynamic ore 
-              toReplace.put(blockpos, creeper.getOre().defaultBlockState());
-              replaced = true;
-              //set replaced=true to skip destruction
+            //itsa valid entity, so NOW check recipe
+            for (ExplosionRecipe recipe : level.getRecipeManager().getAllRecipesFor(PartyCreeperRegistry.RECIPE.get())) {
+              if (recipe.getEntityType().equals(key)
+                  && blockstate.is(recipe.getReplace())) {
+                //do it
+                toReplace.put(blockpos, recipe.getOreOutput().defaultBlockState());
+                replaced = true;
+              }
             }
+            //
+            //
+            //            CreepType creeper = PartyCreeperRegistry.CREEPERS.get(key);
+            //            if (blockstate.is(creeper.getReplace())) {
+            //              //TODO: dynamic ore 
+            //              toReplace.put(blockpos, creeper.getOre().defaultBlockState());
+            //              replaced = true;
+            //              //set replaced=true to skip destruction
+            //            }
           }
           else
             VeinCreeperMod.LOGGER.error("ERROR! no valid oreconfigs found for mob " + key);

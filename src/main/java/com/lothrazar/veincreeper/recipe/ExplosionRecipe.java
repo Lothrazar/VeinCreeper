@@ -4,12 +4,13 @@ import com.google.gson.JsonObject;
 import com.lothrazar.veincreeper.PartyCreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -20,11 +21,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class ExplosionRecipe implements Recipe<Container> {
 
   private final ResourceLocation id;
-  private Ingredient replace = null; // TagKey<Block>   BlockTags.STONE_ORE_REPLACEABLES;
+  private TagKey<Block> replace = BlockTags.STONE_ORE_REPLACEABLES;
   private Block oreOutput = null; // Blocks.COAL_ORE;
   private String entityType;
 
-  public ExplosionRecipe(ResourceLocation id, Ingredient input, Block result, String entityType) {
+  public ExplosionRecipe(ResourceLocation id, TagKey<Block> input, Block result, String entityType) {
     super();
     this.id = id;
     this.replace = input;
@@ -67,6 +68,30 @@ public class ExplosionRecipe implements Recipe<Container> {
     return PartyCreeperRegistry.R_SERIALIZER.get();
   }
 
+  public Block getOreOutput() {
+    return oreOutput;
+  }
+
+  public void setOreOutput(Block oreOutput) {
+    this.oreOutput = oreOutput;
+  }
+
+  public String getEntityType() {
+    return entityType;
+  }
+
+  public void setEntityType(String entityType) {
+    this.entityType = entityType;
+  }
+
+  public TagKey<Block> getReplace() {
+    return replace;
+  }
+
+  public void setReplace(TagKey<Block> replace) {
+    this.replace = replace;
+  }
+
   public static class SerializePartyRecipe implements RecipeSerializer<ExplosionRecipe> {
 
     public SerializePartyRecipe() {}
@@ -74,14 +99,13 @@ public class ExplosionRecipe implements Recipe<Container> {
     @Override
     public ExplosionRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
       try {
-        Ingredient target = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "target"));
+        String target = json.get("target").getAsJsonObject().get("tag").getAsString();
+        TagKey<Block> targetMe = TagKey.create(Registries.BLOCK, new ResourceLocation(target));
         String entity = json.get(VeinCreeperMod.MODID).getAsString();
         String blockId = json.get("ore").getAsJsonObject().get("block").getAsString();
         Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockId));
-        //        Ingredient inputFirst = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
-        //        ItemStack resultStack = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
         VeinCreeperMod.LOGGER.error("SUCCESS loading recipe" + recipeId);
-        return new ExplosionRecipe(recipeId, target, ore, entity);
+        return new ExplosionRecipe(recipeId, targetMe, ore, entity);
       }
       catch (Exception e) {
         VeinCreeperMod.LOGGER.error("Error loading recipe" + recipeId, e);
@@ -91,18 +115,20 @@ public class ExplosionRecipe implements Recipe<Container> {
 
     @Override
     public ExplosionRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-      var input = Ingredient.fromNetwork(buffer);
+      var target = buffer.readResourceLocation();//Ingredient.fromNetwork(buffer);
       var block = buffer.readResourceLocation();
       var entity = buffer.readUtf();
-      ExplosionRecipe r = new ExplosionRecipe(recipeId, input, ForgeRegistries.BLOCKS.getValue(block), entity);
+      ExplosionRecipe r = new ExplosionRecipe(recipeId,
+          TagKey.create(Registries.BLOCK, target),
+          ForgeRegistries.BLOCKS.getValue(block), entity);
       //server reading recipe from client or vice/versa 
       return r;
     }
 
     @Override
     public void toNetwork(FriendlyByteBuf buffer, ExplosionRecipe recipe) {
-      // replace, block, entity
-      recipe.replace.toNetwork(buffer);
+      // replace, block, entity 
+      buffer.writeResourceLocation(recipe.replace.location());
       var key = ForgeRegistries.BLOCKS.getKey(recipe.oreOutput);
       buffer.writeResourceLocation(key);
       buffer.writeUtf(recipe.entityType);

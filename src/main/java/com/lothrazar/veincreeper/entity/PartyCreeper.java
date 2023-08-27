@@ -1,6 +1,7 @@
 package com.lothrazar.veincreeper.entity;
 
-import com.lothrazar.veincreeper.ConfigManager;
+import com.lothrazar.veincreeper.conf.ConfigManager;
+import com.lothrazar.veincreeper.explosion.ExplosionParty;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;

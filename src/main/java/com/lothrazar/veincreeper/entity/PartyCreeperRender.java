@@ -1,6 +1,6 @@
 package com.lothrazar.veincreeper.entity;
 
-import com.lothrazar.veincreeper.ConfigManager;
+import com.lothrazar.veincreeper.conf.ConfigManager;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.MultiBufferSource;

@@ -1,5 +1,7 @@
-package com.lothrazar.veincreeper;
+package com.lothrazar.veincreeper.conf;
 
+import com.lothrazar.veincreeper.PartyCreeperRegistry;
+import com.lothrazar.veincreeper.VeinCreeperMod;
 import com.lothrazar.veincreeper.entity.PartyCreeperRender;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;

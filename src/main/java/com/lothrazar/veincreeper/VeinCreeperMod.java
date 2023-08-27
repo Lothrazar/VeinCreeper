@@ -2,6 +2,8 @@ package com.lothrazar.veincreeper;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.lothrazar.veincreeper.conf.ConfigManager;
+import com.lothrazar.veincreeper.conf.CreeperCmd;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;

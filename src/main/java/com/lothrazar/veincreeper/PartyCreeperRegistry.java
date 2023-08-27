@@ -2,6 +2,8 @@ package com.lothrazar.veincreeper;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.lothrazar.veincreeper.conf.ConfigManager;
+import com.lothrazar.veincreeper.conf.CreepType;
 import com.lothrazar.veincreeper.entity.PartyCreeper;
 import com.lothrazar.veincreeper.entity.PartyCreeperRender;
 import com.lothrazar.veincreeper.recipe.ExplosionRecipe;

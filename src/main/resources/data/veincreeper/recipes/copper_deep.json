@@ -1,0 +1,10 @@
+{
+	"type": "veincreeper:explosion",
+	"veincreeper": "copper_creeper",
+	"target": {
+		"tag": "minecraft:deepslate_ore_replaceables"
+	},
+	"ore": {
+		"block": "minecraft:deepslate_copper_ore"
+	}
+}
