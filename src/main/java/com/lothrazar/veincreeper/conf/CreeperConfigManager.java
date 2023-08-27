@@ -26,7 +26,8 @@ public class CreeperConfigManager extends ConfigTemplate {
       "redstone_creeper,235,35,0,255,Redstone,true",
       "lapis_creeper,0,0,255,240,Lapis,true",
       "emerald_creeper,0,255,0,255,Emerald,false",
-      "quartz_creeper,255,255,255,255,Emerald,false" });
+      "quartz_creeper,100,100,100,255,Quartz,false",
+      "purple_creeper,255,0,255,255,Purple,true" });
   static {
     initConfig();
   }

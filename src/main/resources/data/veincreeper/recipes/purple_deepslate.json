@@ -1,0 +1,16 @@
+{
+	"type": "veincreeper:explosion",
+	"veincreeper": "purple_creeper",
+	"target": {
+		"tag": "minecraft:deepslate_ore_replaceables"
+	},
+	"ore": {
+		"block": "minecraft:obsidian"
+	},
+	"conditions": [
+		{
+			"type": "flib:entity_exists",
+			"value": "veincreeper:purple_creeper"
+		}
+	]
+}

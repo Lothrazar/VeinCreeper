@@ -2,5 +2,5 @@
 #General settings
 [veincreeper]
 	#IMPORTANT: new creepers added here may not generate ore without adding custom recipes of type 'veincreeper:explosion', add more using datapacks.  Each row here will register one new creeper entity type. (unique_id,red,green,blue,display_name). The 'unique_id' string must exactly match the property used in the explosion recipe, this will link the creeper mob to the ore explosion recipe.  Color values are used as an overlay to existing creeper texture.  Test them out /summon veincreeper:coal_creeper
-	creepers = ["coal_creeper,40,20,20,150,Coal,false", "iron_creeper,130,60,20,200,Iron,true", "diamond_creeper,0,120,200,255,Diamond,false", "copper_creeper,200,90,0,200,Copper,true", "gold_creeper,240,240,0,200,Gold,true", "redstone_creeper,235,35,0,255,Redstone,true", "lapis_creeper,0,0,255,240,Lapis,true", "emerald_creeper,0,255,0,255,Emerald,false"]
+	creepers = ["coal_creeper,40,20,20,150,Coal,false", "iron_creeper,130,60,20,200,Iron,true", "diamond_creeper,0,120,200,255,Diamond,false", "copper_creeper,200,90,0,200,Copper,true", "gold_creeper,240,240,0,200,Gold,true", "redstone_creeper,235,35,0,255,Redstone,true", "lapis_creeper,0,0,255,240,Lapis,true", "emerald_creeper,0,255,0,255,Emerald,false", "quartz_creeper,100,100,100,255,Quartz,false", "purple_creeper,255,0,255,255,Purple,true"]
 

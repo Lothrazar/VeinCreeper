@@ -1,16 +1,16 @@
 {
 	"type": "veincreeper:explosion",
-	"veincreeper": "lapis_creeper",
+	"veincreeper": "purple_creeper",
 	"target": {
 		"tag": "minecraft:stone_ore_replaceables"
 	},
 	"ore": {
-		"block": "minecraft:deepslate_lapis_ore"
+		"block": "minecraft:purple_concrete"
 	},
 	"conditions": [
 		{
 			"type": "flib:entity_exists",
-			"value": "veincreeper:lapis_creeper"
+			"value": "veincreeper:purple_creeper"
 		}
 	]
 }

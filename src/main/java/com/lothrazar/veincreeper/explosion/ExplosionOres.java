@@ -89,7 +89,7 @@ public class ExplosionOres extends Explosion {
                 recipeFound = true;
                 //BONUS? or normal
                 if (recipe.getBonus() != null && recipe.getBonusChance() > 0
-                    && (recipe.getBonusChance() / 100F) < level.random.nextDouble()) {
+                    && (recipe.getBonusChance() / 100F) > level.random.nextDouble()) {
                   //ok
                   toReplace.put(blockpos, recipe.getBonus().defaultBlockState());
                   VeinCreeperMod.LOGGER.info("Explosion recipe applied BONUS " + recipe.getId());

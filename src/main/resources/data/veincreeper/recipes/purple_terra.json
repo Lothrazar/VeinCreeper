@@ -1,0 +1,18 @@
+{
+	"type": "veincreeper:explosion",
+	"veincreeper": "purple_creeper",
+	"target": {
+		"tag": "minecraft:terracotta"
+	},
+	"ore": {
+		"block": "minecraft:purple_terracotta",
+		"bonus": "minecraft:purple_glazed_terracotta",
+		"bonusChance": 5.0
+	},
+	"conditions": [
+		{
+			"type": "flib:entity_exists",
+			"value": "veincreeper:purple_creeper"
+		}
+	]
+}

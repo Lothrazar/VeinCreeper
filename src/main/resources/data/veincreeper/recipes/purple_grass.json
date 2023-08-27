@@ -1,0 +1,16 @@
+{
+	"type": "veincreeper:explosion",
+	"veincreeper": "purple_creeper",
+	"target": {
+		"tag": "minecraft:dirt"
+	},
+	"ore": {
+		"block": "minecraft:purple_wool"
+	},
+	"conditions": [
+		{
+			"type": "flib:entity_exists",
+			"value": "veincreeper:purple_creeper"
+		}
+	]
+}
