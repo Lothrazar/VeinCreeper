@@ -1,21 +1,24 @@
 package com.lothrazar.veincreeper.conf;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 
 public class CreepType {
 
   private String id;
-  private int[] color = new int[3];//render overrides
+  private int[] color = new int[4];//render overrides. format is RGBA in range [0,255] render maps this to [0,1]
   private EntityType entityType; //hold just for registries
   private String blockName;//for display name only
+  private boolean shouldDropExperience;
 
-  public CreepType(String id, int[] col, String blockName) {
-    if (id == null || col.length != 3) {
-      throw new IllegalArgumentException("Check config values and try again for id=" + id);
+  public CreepType(String id, int[] col, String blockName, boolean exp) {
+    if (col.length != 4) {
+      throw new IllegalArgumentException("Check color-config values and try again for id=" + id);
     }
     this.setId(id);
-    setColor(col);
+    this.setColor(col);
     this.setBlockName(blockName);
+    this.shouldDropExperience = exp;
   }
 
   public EntityType getEntityType() {
@@ -48,5 +51,13 @@ public class CreepType {
 
   public void setBlockName(String blockName) {
     this.blockName = blockName;
+  }
+
+  public Component getDisplayName() {
+    return Component.literal(this.getBlockName()).append(" ").append(EntityType.CREEPER.getDescription());
+  }
+
+  public boolean shouldDropExperience() {
+    return this.shouldDropExperience;
   }
 }

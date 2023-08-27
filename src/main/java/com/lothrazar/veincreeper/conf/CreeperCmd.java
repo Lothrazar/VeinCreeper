@@ -1,8 +1,9 @@
 package com.lothrazar.veincreeper.conf;
 
-import com.lothrazar.veincreeper.PartyCreeperRegistry;
+import java.util.Arrays;
+import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
-import com.lothrazar.veincreeper.entity.PartyCreeperRender;
+import com.lothrazar.veincreeper.entity.VeinCreeperRender;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -34,21 +35,24 @@ public class CreeperCmd {
                 .then(Commands.argument("r", IntegerArgumentType.integer())
                     .then(Commands.argument("g", IntegerArgumentType.integer())
                         .then(Commands.argument("b", IntegerArgumentType.integer())
-                            .executes(x -> {
-                              return execute(x, StringArgumentType.getString(x, "creeper"), IntegerArgumentType.getInteger(x, "r"), IntegerArgumentType.getInteger(x, "g"), IntegerArgumentType.getInteger(x, "b"));
-                            }))))))
+                            .then(Commands.argument("alpha", IntegerArgumentType.integer())
+                                .executes(x -> {
+                                  return execute(x, StringArgumentType.getString(x, "creeper"), IntegerArgumentType.getInteger(x, "r"), IntegerArgumentType.getInteger(x, "g"), IntegerArgumentType.getInteger(x, "b"), IntegerArgumentType.getInteger(x, "alpha"));
+                                })))))))
     //
     );
   }
 
-  private int execute(CommandContext<CommandSourceStack> x, String string, int r, int g, int b) {
+  private int execute(CommandContext<CommandSourceStack> x, String string, int r, int g, int b, int alpha) {
     r = parseCol(r);
     g = parseCol(g);
     b = parseCol(b);
-    for (var creeperId : PartyCreeperRegistry.CREEPERS.keySet()) {
+    for (var creeperId : CreeperRegistry.CREEPERS.keySet()) {
       if (creeperId.equals(string)) {
-        PartyCreeperRegistry.CREEPERS.get(creeperId).setColor(new int[] { r, g, b });
-        PartyCreeperRender.doRefresh = true;//hakxor
+        var color = new int[] { r, g, b, alpha };
+        VeinCreeperMod.LOGGER.debug(creeperId + " setColor " + Arrays.toString(color));
+        CreeperRegistry.CREEPERS.get(creeperId).setColor(color);
+        VeinCreeperRender.doRefresh = true; //hakxor
         return 0;
       }
     }

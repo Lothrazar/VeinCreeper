@@ -2,10 +2,10 @@ package com.lothrazar.veincreeper;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.lothrazar.veincreeper.conf.ConfigManager;
+import com.lothrazar.veincreeper.conf.CreeperConfigManager;
 import com.lothrazar.veincreeper.conf.CreepType;
-import com.lothrazar.veincreeper.entity.PartyCreeper;
-import com.lothrazar.veincreeper.entity.PartyCreeperRender;
+import com.lothrazar.veincreeper.entity.VeinCreeper;
+import com.lothrazar.veincreeper.entity.VeinCreeperRender;
 import com.lothrazar.veincreeper.recipe.ExplosionRecipe;
 import com.lothrazar.veincreeper.recipe.ExplosionRecipe.SerializePartyRecipe;
 import net.minecraft.core.registries.Registries;
@@ -26,7 +26,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 @SuppressWarnings("unchecked")
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-public class PartyCreeperRegistry {
+public class CreeperRegistry {
 
   static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, VeinCreeperMod.MODID);
   static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, VeinCreeperMod.MODID);
@@ -35,14 +35,14 @@ public class PartyCreeperRegistry {
   });
   public static final RegistryObject<SerializePartyRecipe> R_SERIALIZER = RECIPE_SERIALIZERS.register("explosion", SerializePartyRecipe::new);
   //
-  static Builder<PartyCreeper> BUILDER = EntityType.Builder.<PartyCreeper> of(PartyCreeper::new, MobCategory.MISC).sized(1.4F, 2.7F - 0.3F).clientTrackingRange(10);
+  static Builder<VeinCreeper> BUILDER = EntityType.Builder.<VeinCreeper> of(VeinCreeper::new, MobCategory.MISC).sized(1.4F, 2.7F - 0.3F).clientTrackingRange(10);
   public static Map<String, CreepType> CREEPERS = new HashMap<>();
 
   @SubscribeEvent
   public static void onRegistry(RegisterEvent event) {
     event.register(Registries.ENTITY_TYPE, reg -> {
       //TODO: parse/refresh config from that one event
-      ConfigManager.parseConfig();
+      CreeperConfigManager.parseConfig();
       for (CreepType type : CREEPERS.values()) {
         createCreeper(reg, type);
       }
@@ -57,15 +57,14 @@ public class PartyCreeperRegistry {
   @SubscribeEvent
   public static void onEntityAttributeCreationEvent(EntityAttributeCreationEvent event) {
     for (var c : CREEPERS.values()) {
-      event.put(c.getEntityType(), PartyCreeper.createAttributes().build());
+      event.put(c.getEntityType(), VeinCreeper.createAttributes().build());
     }
   }
 
   @SubscribeEvent
   public static void entityRenderers(EntityRenderersEvent.RegisterRenderers event) {
     for (var c : CREEPERS.values()) {
-      c.getColor(); /////////////// 
-      event.registerEntityRenderer(c.getEntityType(), PartyCreeperRender::new);
+      event.registerEntityRenderer(c.getEntityType(), VeinCreeperRender::new);
     }
   }
 }

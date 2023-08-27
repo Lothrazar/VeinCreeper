@@ -1,7 +1,7 @@
 package com.lothrazar.veincreeper.recipe;
 
 import com.google.gson.JsonObject;
-import com.lothrazar.veincreeper.PartyCreeperRegistry;
+import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -60,12 +60,12 @@ public class ExplosionRecipe implements Recipe<Container> {
 
   @Override
   public RecipeType<?> getType() {
-    return PartyCreeperRegistry.RECIPE.get();
+    return CreeperRegistry.RECIPE.get();
   }
 
   @Override
   public RecipeSerializer<?> getSerializer() {
-    return PartyCreeperRegistry.R_SERIALIZER.get();
+    return CreeperRegistry.R_SERIALIZER.get();
   }
 
   public Block getOreOutput() {

@@ -2,9 +2,9 @@ package com.lothrazar.veincreeper.explosion;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.lothrazar.veincreeper.PartyCreeperRegistry;
+import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
-import com.lothrazar.veincreeper.conf.ConfigManager;
+import com.lothrazar.veincreeper.conf.CreeperConfigManager;
 import com.lothrazar.veincreeper.recipe.ExplosionRecipe;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -30,7 +30,7 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 
-public class ExplosionParty extends Explosion {
+public class ExplosionOres extends Explosion {
 
   private final RandomSource random = RandomSource.create();
   private final Level level;
@@ -41,7 +41,7 @@ public class ExplosionParty extends Explosion {
   private final double z;
   private final Explosion.BlockInteraction blockInteraction;
 
-  public ExplosionParty(Level level, Entity entity, DamageSource src, ExplosionDamageCalculator calc, double x, double y, double z, float radius, boolean f, Explosion.BlockInteraction bi) {
+  public ExplosionOres(Level level, Entity entity, DamageSource src, ExplosionDamageCalculator calc, double x, double y, double z, float radius, boolean f, Explosion.BlockInteraction bi) {
     super(level, entity, src, calc, x, y, z, radius, f, bi);
     this.level = level;
     this.radius = radius;
@@ -78,10 +78,10 @@ public class ExplosionParty extends Explosion {
           this.level.getProfiler().push("explosion_blocks");
           //overrides
           boolean replaced = false;
-          final String key = ConfigManager.getKeyFromEntity(this.getExploder());
-          if (PartyCreeperRegistry.CREEPERS.containsKey(key)) {
+          final String key = CreeperConfigManager.getKeyFromEntity(this.getExploder());
+          if (CreeperRegistry.CREEPERS.containsKey(key)) {
             //itsa valid entity, so NOW check recipe
-            for (ExplosionRecipe recipe : level.getRecipeManager().getAllRecipesFor(PartyCreeperRegistry.RECIPE.get())) {
+            for (ExplosionRecipe recipe : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.RECIPE.get())) {
               if (recipe.getEntityType().equals(key) && blockstate.is(recipe.getReplace())) {
                 //do it
                 toReplace.put(blockpos, recipe.getOreOutput().defaultBlockState());

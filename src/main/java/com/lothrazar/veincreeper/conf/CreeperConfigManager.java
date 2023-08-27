@@ -4,30 +4,29 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import com.lothrazar.library.config.ConfigTemplate;
-import com.lothrazar.veincreeper.PartyCreeperRegistry;
+import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
-import com.lothrazar.veincreeper.entity.PartyCreeper;
-import net.minecraft.network.chat.Component;
+import com.lothrazar.veincreeper.entity.VeinCreeper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
-public class ConfigManager extends ConfigTemplate {
+public class CreeperConfigManager extends ConfigTemplate {
 
   private static ForgeConfigSpec CONFIG;
   public static ConfigValue<List<? extends String>> ENTITIES;
   //default entities
   private static final List<String> DFLT = Arrays.asList(new String[] {
       //TODO: minecraft:deepslate_ore_replaceables  | minecraft:deepslate_coal_ore 
-      "coal_creeper,40,20,20,Coal",
-      "iron_creeper,130,60,20,Iron",
-      "diamond_creeper,0,120,200,Diamond",
-      "copper_creeper,200,90,0,Copper",
-      "gold_creeper,240,240,0,Gold", //nether variant
-      "redstone_creeper,235,35,0,Redstone",
-      "lapis_creeper,0,0,255,Lapis",
-      "emerald_creeper,0,255,0,Emerald"
+      "coal_creeper,40,20,20,150,Coal,false",
+      "iron_creeper,130,60,20,200,Iron,true",
+      "diamond_creeper,0,120,200,255,Diamond,false",
+      "copper_creeper,200,90,0,200,Copper,true",
+      "gold_creeper,240,240,0,200,Gold,true", //nether variant
+      "redstone_creeper,235,35,0,255,Redstone,true",
+      "lapis_creeper,0,0,255,240,Lapis,true",
+      "emerald_creeper,0,255,0,255,Emerald,false"
       //quartz? (nether)
   });
   static {
@@ -43,29 +42,31 @@ public class ConfigManager extends ConfigTemplate {
     CONFIG = BUILDER.build();
   }
 
-  public ConfigManager() {
+  public CreeperConfigManager() {
     CONFIG.setConfig(setup(VeinCreeperMod.MODID));
   }
 
   public static void parseConfig() {
-    PartyCreeperRegistry.CREEPERS = new HashMap<>();
+    CreeperRegistry.CREEPERS = new HashMap<>();
     // TODO Auto-generated method stub 
     for (String line : ENTITIES.get()) {
       String[] arr = line.split(",");
       try {
         String id = arr[0];
-        int[] color = new int[] { Integer.parseInt(arr[1]), Integer.parseInt(arr[2]), Integer.parseInt(arr[3]) };
-        PartyCreeperRegistry.CREEPERS.put(id, new CreepType(arr[0], color, arr[4]));
+        int[] color = new int[] { Integer.parseInt(arr[1]), Integer.parseInt(arr[2]), Integer.parseInt(arr[3]), Integer.parseInt(arr[4]) };
+        CreeperRegistry.CREEPERS.put(id, new CreepType(arr[0], color, arr[5], Boolean.parseBoolean(arr[6])));
       }
       catch (Exception e) {
-        VeinCreeperMod.LOGGER.error("Error parsing config (new_entity,red,green,blue,tag,block)  " + arr);
+        VeinCreeperMod.LOGGER.error(" CSV error: ", e);
+        //////////////////////////////////////////////////// 0      1    2     3    4      5             6
+        VeinCreeperMod.LOGGER.error("Error parsing config (entityId,red,green,blue,alpha,displayName,shouldDropExp)  " + Arrays.toString(arr));
       }
     }
   }
 
   public static int[] getCreeperColor(String key) {
-    if (PartyCreeperRegistry.CREEPERS.containsKey(key)) {
-      return PartyCreeperRegistry.CREEPERS.get(key).getColor();
+    if (CreeperRegistry.CREEPERS.containsKey(key)) {
+      return CreeperRegistry.CREEPERS.get(key).getColor();
     }
     VeinCreeperMod.LOGGER.error("ERROR! no color found for mob " + key);
     return new int[] { 200, 0, 0 };
@@ -76,12 +77,24 @@ public class ConfigManager extends ConfigTemplate {
     return key;
   }
 
-  public static Component getDisplayName(PartyCreeper partyCreeper) {
-    for (var creeper : PartyCreeperRegistry.CREEPERS.values()) {
-      if (creeper.getEntityType() == partyCreeper.getType()) {
-        return Component.literal(creeper.getBlockName()).append(" ").append(EntityType.CREEPER.getDescription());
+  public static CreepType getCreepType(EntityType partyCreeper) {
+    for (var creeper : CreeperRegistry.CREEPERS.values()) {
+      if (creeper.getEntityType() == partyCreeper) {
+        return creeper;
       }
     }
     return null;
   }
+
+  public static CreepType getCreepType(VeinCreeper partyCreeper) {
+    return getCreepType(partyCreeper.getType());
+  }
+  //  public static Component getDisplayName(PartyCreeper partyCreeper) {
+  //    for (var creeper : PartyCreeperRegistry.CREEPERS.values()) {
+  //      if (creeper.getEntityType() == partyCreeper.getType()) {
+  //        return Component.literal(creeper.getBlockName()).append(" ").append(EntityType.CREEPER.getDescription());
+  //      }
+  //    }
+  //    return null;
+  //  }
 }
