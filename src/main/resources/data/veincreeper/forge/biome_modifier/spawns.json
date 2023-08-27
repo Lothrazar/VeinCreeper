@@ -4,25 +4,7 @@
 
   "spawners": [
     {
-      "type": "veincreeper:dirt_creeper",
-      "maxCount": 5,
-      "minCount": 2,
-      "weight": 99
-    },
-    {
-      "type": "veincreeper:copper_creeper",
-      "maxCount": 5,
-      "minCount": 2,
-      "weight": 99
-    },
-    {
-      "type": "veincreeper:iron_creeper",
-      "maxCount": 4,
-      "minCount": 2,
-      "weight": 8
-    },
-    {
-      "type": "veincreeper:diamond_creeper",
+      "type": "veincreeper:lapis_creeper",
       "maxCount": 4,
       "minCount": 2,
       "weight": 99

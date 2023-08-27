@@ -11,14 +11,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
 public class ConfigManager extends ConfigTemplate {
 
   private static ForgeConfigSpec CONFIG;
-  public static ConfigValue<List<String>> ENTITIES;
-  private static BooleanValue NATURAL_SPAWNS;
+  public static ConfigValue<List<? extends String>> ENTITIES;
   //default entities
   private static final List<String> DFLT = Arrays.asList(new String[] {
       //TODO: minecraft:deepslate_ore_replaceables  | minecraft:deepslate_coal_ore 
@@ -39,8 +37,8 @@ public class ConfigManager extends ConfigTemplate {
   private static void initConfig() {
     final ForgeConfigSpec.Builder BUILDER = builder();
     BUILDER.comment("General settings").push(VeinCreeperMod.MODID);
-    ENTITIES = BUILDER.comment("IMPORTANT: new creepers added here may not generate ore without adding custom recipes of type 'veincreeper:explosion', add more using datapacks.  Each row here will register one new creeper entity type. (unique_id,red,green,blue,display_name). The 'unique_id' string must exactly match the property used in the explosion recipe, this will link the creeper mob to the ore explosion recipe.  Color values are used as an overlay to existing creeper texture.  Test them out /summon veincreeper:coal_creeper").define("creepers", DFLT);
-    NATURAL_SPAWNS = BUILDER.comment("True to spawn naturally").define("spawning", false); // TODO:!!!!
+    ENTITIES = BUILDER.comment("IMPORTANT: new creepers added here may not generate ore without adding custom recipes of type 'veincreeper:explosion', add more using datapacks.  Each row here will register one new creeper entity type. (unique_id,red,green,blue,display_name). The 'unique_id' string must exactly match the property used in the explosion recipe, this will link the creeper mob to the ore explosion recipe.  Color values are used as an overlay to existing creeper texture.  Test them out /summon veincreeper:coal_creeper")
+        .defineList("creepers", DFLT, s -> s instanceof String);
     BUILDER.pop(); // one pop for every push
     CONFIG = BUILDER.build();
   }
