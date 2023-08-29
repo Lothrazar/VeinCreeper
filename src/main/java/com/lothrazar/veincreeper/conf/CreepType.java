@@ -1,5 +1,6 @@
 package com.lothrazar.veincreeper.conf;
 
+import com.lothrazar.veincreeper.entity.VeinCreeper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 
@@ -7,7 +8,7 @@ public class CreepType {
 
   private String id;
   private int[] color = new int[4];//render overrides. format is RGBA in range [0,255] render maps this to [0,1]
-  private EntityType entityType; //hold just for registries
+  private EntityType<VeinCreeper> entityType; //hold just for registries
   private String blockName;//for display name only
   private boolean shouldDropExperience;
 
@@ -21,11 +22,11 @@ public class CreepType {
     this.shouldDropExperience = exp;
   }
 
-  public EntityType getEntityType() {
+  public EntityType<VeinCreeper> getEntityType() {
     return entityType;
   }
 
-  public void setEntityType(EntityType entityType) {
+  public void setEntityType(EntityType<VeinCreeper> entityType) {
     this.entityType = entityType;
   }
 

@@ -1,4 +1,4 @@
-package com.lothrazar.veincreeper.recipe;
+package com.lothrazar.veincreeper.recipe.zen;
 
 import org.openzen.zencode.java.ZenCodeType;
 import com.blamejared.crafttweaker.api.CraftTweakerAPI;
@@ -7,6 +7,7 @@ import com.blamejared.crafttweaker.api.annotation.ZenRegister;
 import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
+import com.lothrazar.veincreeper.recipe.ExplosionRecipe;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -24,26 +25,26 @@ public class CreeperZen implements IRecipeManager<ExplosionRecipe> {
   }
 
   @ZenCodeType.Method
-  public void addRecipe(String name, String entityType, String target, String blockId) {
+  public void addRecipe(String name, String blockTagTarget, String blockResult, String entityType) {
     name = fixRecipeName(name);
-    TagKey<Block> targetMe = TagKey.create(Registries.BLOCK, new ResourceLocation(target));
-    Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockId));
-    ExplosionRecipe m = new ExplosionRecipe(new ResourceLocation("crafttweaker", name),
+    TagKey<Block> targetMe = TagKey.create(Registries.BLOCK, new ResourceLocation(blockTagTarget));
+    Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockResult));
+    ExplosionRecipe m = new ExplosionRecipe(new ResourceLocation("crafttweaker", name), new ResourceLocation(entityType),
         targetMe,
-        ore, entityType);
+        ore);
     CraftTweakerAPI.apply(new ActionAddRecipe<ExplosionRecipe>(this, m, ""));
     VeinCreeperMod.LOGGER.info("crafttweaker: Recipe loaded " + m.getId().toString());
   }
 
   @ZenCodeType.Method
-  public void addRecipe(String name, String entityType, String target, String blockId, String bonusId, float chance) {
+  public void addRecipe(String name, String blockTagTarget, String blockResult, String entityType, String bonusId, float chance) {
     name = fixRecipeName(name);
-    TagKey<Block> targetMe = TagKey.create(Registries.BLOCK, new ResourceLocation(target));
-    Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockId));
+    TagKey<Block> targetMe = TagKey.create(Registries.BLOCK, new ResourceLocation(blockTagTarget));
+    Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockResult));
     Block bonus = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(bonusId));
-    ExplosionRecipe m = new ExplosionRecipe(new ResourceLocation("crafttweaker", name),
+    ExplosionRecipe m = new ExplosionRecipe(new ResourceLocation("crafttweaker", name), new ResourceLocation(entityType),
         targetMe,
-        ore, entityType, bonus, chance);
+        ore, bonus, chance);
     CraftTweakerAPI.apply(new ActionAddRecipe<ExplosionRecipe>(this, m, ""));
     VeinCreeperMod.LOGGER.info("crafttweaker: Recipe loaded " + m.getId().toString());
   }

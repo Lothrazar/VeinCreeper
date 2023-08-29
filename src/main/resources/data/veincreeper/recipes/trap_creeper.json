@@ -1,0 +1,18 @@
+{
+	"type": "veincreeper:trap",
+	"itemOnGround": {
+		"tag": "forge:dyes/red"
+	},
+	"trappedEntity": {
+		"id": "minecraft:creeper"
+	},
+	"transformedEntity": {
+		"id": "veincreeper:redstone_creeper"
+	},
+	"conditions": [
+		{
+			"type": "flib:entity_exists",
+			"value": "veincreeper:redstone_creeper"
+		}
+	]
+}

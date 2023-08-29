@@ -23,23 +23,23 @@ public class ExplosionRecipe implements Recipe<Container> {
   private final ResourceLocation id;
   private TagKey<Block> replace = BlockTags.STONE_ORE_REPLACEABLES;
   private Block oreOutput = null; // Blocks.COAL_ORE;
-  private String entityType;
+  private ResourceLocation entityType;
   private Block bonus = null;
   private float bonusChance = 0;
 
-  public ExplosionRecipe(ResourceLocation id, TagKey<Block> input, Block result, String entityType,
+  public ExplosionRecipe(ResourceLocation id, ResourceLocation entityType, TagKey<Block> blockReplace, Block result,
       Block bonus, float chance) {
     super();
     this.id = id;
-    this.replace = input;
+    this.replace = blockReplace;
     this.oreOutput = result;
     this.entityType = entityType;
     this.bonus = bonus;
     this.bonusChance = chance;
   }
 
-  public ExplosionRecipe(ResourceLocation id, TagKey<Block> input, Block result, String entityType) {
-    this(id, input, result, entityType, null, 0);
+  public ExplosionRecipe(ResourceLocation id, ResourceLocation entityType, TagKey<Block> input, Block result) {
+    this(id, entityType, input, result, null, 0);
   }
 
   @Override
@@ -85,11 +85,11 @@ public class ExplosionRecipe implements Recipe<Container> {
     this.oreOutput = oreOutput;
   }
 
-  public String getEntityType() {
+  public ResourceLocation getEntityType() {
     return entityType;
   }
 
-  public void setEntityType(String entityType) {
+  public void setEntityType(ResourceLocation entityType) {
     this.entityType = entityType;
   }
 
@@ -130,7 +130,7 @@ public class ExplosionRecipe implements Recipe<Container> {
       try {
         String target = json.get("target").getAsJsonObject().get("tag").getAsString();
         TagKey<Block> targetMe = TagKey.create(Registries.BLOCK, new ResourceLocation(target));
-        String entity = json.get(VeinCreeperMod.MODID).getAsString();
+        ResourceLocation entity = new ResourceLocation(json.get(VeinCreeperMod.MODID).getAsString());
         JsonObject oreJson = json.get("ore").getAsJsonObject();
         String blockId = oreJson.get("block").getAsString();
         Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockId));
@@ -143,7 +143,7 @@ public class ExplosionRecipe implements Recipe<Container> {
           bonusChance = oreJson.get("bonusChance").getAsFloat();
         }
         VeinCreeperMod.LOGGER.debug("SUCCESS loading recipe  " + recipeId);
-        return new ExplosionRecipe(recipeId, targetMe, ore, entity, bonus, bonusChance);
+        return new ExplosionRecipe(recipeId, entity, targetMe, ore, bonus, bonusChance);
       }
       catch (Exception e) {
         VeinCreeperMod.LOGGER.error("Error loading recipe  " + recipeId, e);
@@ -153,12 +153,13 @@ public class ExplosionRecipe implements Recipe<Container> {
 
     @Override
     public ExplosionRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-      var target = buffer.readResourceLocation();//Ingredient.fromNetwork(buffer);
+      var target = buffer.readResourceLocation();
       var block = buffer.readResourceLocation();
-      var entity = buffer.readUtf();
+      var entity = buffer.readResourceLocation();
       ExplosionRecipe r = new ExplosionRecipe(recipeId,
+          entity,
           TagKey.create(Registries.BLOCK, target),
-          ForgeRegistries.BLOCKS.getValue(block), entity);
+          ForgeRegistries.BLOCKS.getValue(block));
       //server reading recipe from client or vice/versa 
       return r;
     }
@@ -169,7 +170,7 @@ public class ExplosionRecipe implements Recipe<Container> {
       buffer.writeResourceLocation(recipe.replace.location());
       var key = ForgeRegistries.BLOCKS.getKey(recipe.oreOutput);
       buffer.writeResourceLocation(key);
-      buffer.writeUtf(recipe.entityType);
+      buffer.writeResourceLocation(recipe.entityType);
     }
   }
 }
