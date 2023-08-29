@@ -3,6 +3,7 @@ package com.lothrazar.veincreeper;
 import java.util.HashMap;
 import java.util.Map;
 import com.lothrazar.veincreeper.block.CreeperTrap;
+import com.lothrazar.veincreeper.block.TileCreeperTrap;
 import com.lothrazar.veincreeper.conf.CreepType;
 import com.lothrazar.veincreeper.conf.CreeperConfigManager;
 import com.lothrazar.veincreeper.entity.VeinCreeper;
@@ -41,7 +42,8 @@ public class CreeperRegistry {
   static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, VeinCreeperMod.MODID);
   public static final RegistryObject<Block> TRAP = BLOCKS.register("trap", () -> new CreeperTrap(Block.Properties.of()));
   public static final RegistryObject<Item> TRAP_ITEM = ITEMS.register("trap", () -> new BlockItem(TRAP.get(), new Item.Properties()));
-  public static final RegistryObject<RecipeType<ExplosionRecipe>> RECIPE = RECIPE_TYPES.register("explosion", () -> new RecipeType<ExplosionRecipe>() {});
+  public static final RegistryObject<BlockEntityType<TileCreeperTrap>> TRAP_TILE = TILES.register("trap", () -> BlockEntityType.Builder.of(TileCreeperTrap::new, TRAP.get()).build(null));
+  public static final RegistryObject<RecipeType<ExplosionRecipe>> EXPLOSION_RECIPE = RECIPE_TYPES.register("explosion", () -> new RecipeType<ExplosionRecipe>() {});
   public static final RegistryObject<SerializePartyRecipe> R_SERIALIZER = RECIPE_SERIALIZERS.register("explosion", SerializePartyRecipe::new);
   public static final RegistryObject<RecipeType<TrapRecipe>> RECIPE_TRAP = RECIPE_TYPES.register("trap", () -> new RecipeType<TrapRecipe>() {});
   public static final RegistryObject<SerializeTrapRecipe> TRAP_SERIALIZER = RECIPE_SERIALIZERS.register("trap", SerializeTrapRecipe::new);

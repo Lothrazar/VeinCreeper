@@ -69,7 +69,7 @@ public class ExplosionRecipe implements Recipe<Container> {
 
   @Override
   public RecipeType<?> getType() {
-    return CreeperRegistry.RECIPE.get();
+    return CreeperRegistry.EXPLOSION_RECIPE.get();
   }
 
   @Override

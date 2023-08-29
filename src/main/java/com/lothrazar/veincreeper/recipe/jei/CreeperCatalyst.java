@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.Block;
 
 public class CreeperCatalyst implements IRecipeCategory<ExplosionRecipe> {
 
-  public static final ResourceLocation ID = new ResourceLocation(CreeperRegistry.RECIPE.getId().toString());
+  public static final ResourceLocation ID = new ResourceLocation(CreeperRegistry.EXPLOSION_RECIPE.getId().toString());
   static final RecipeType<ExplosionRecipe> TYPE = new RecipeType<>(ID, ExplosionRecipe.class);
   private IDrawable gui;
   private IDrawable icon;

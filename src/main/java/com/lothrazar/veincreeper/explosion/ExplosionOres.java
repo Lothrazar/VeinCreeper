@@ -83,7 +83,7 @@ public class ExplosionOres extends Explosion {
           if (CreeperRegistry.CREEPERS.containsKey(key)) {
             //itsa valid entity, so NOW check recipe
             boolean recipeFound = false;
-            for (ExplosionRecipe recipe : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.RECIPE.get())) {
+            for (ExplosionRecipe recipe : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.EXPLOSION_RECIPE.get())) {
               if (recipe.getEntityType().equals(key) && blockstate.is(recipe.getReplace())
                   && recipe.getOreOutput() != null) {
                 recipeFound = true;

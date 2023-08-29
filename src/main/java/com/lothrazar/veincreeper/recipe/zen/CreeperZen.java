@@ -21,7 +21,7 @@ public class CreeperZen implements IRecipeManager<ExplosionRecipe> {
 
   @Override
   public RecipeType<ExplosionRecipe> getRecipeType() {
-    return CreeperRegistry.RECIPE.get();
+    return CreeperRegistry.EXPLOSION_RECIPE.get();
   }
 
   @ZenCodeType.Method

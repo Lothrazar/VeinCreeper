@@ -1,9 +1,10 @@
 package com.lothrazar.veincreeper.block;
 
 import java.util.function.Predicate;
-import com.lothrazar.library.block.BlockFlib;
+import com.lothrazar.library.block.EntityBlockFlib;
 import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.entity.VeinCreeper;
+import com.lothrazar.veincreeper.recipe.ExplosionRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.AttachFace;
@@ -31,7 +33,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class CreeperTrap extends BlockFlib implements SimpleWaterloggedBlock {
+public class CreeperTrap extends EntityBlockFlib implements SimpleWaterloggedBlock {
 
   public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
   public static final DirectionProperty HORIZONTAL_FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -52,13 +54,17 @@ public class CreeperTrap extends BlockFlib implements SimpleWaterloggedBlock {
       16.0D, 16.0D, 16.0D);
   protected static final VoxelShape AABB_EAST_OFF = Block.box(0.0D, 0.0D, 0.0D,
       2.0D, 16.0D, 16.0D);
+  boolean sneakPlayerAvoid = true;
 
   public CreeperTrap(Properties prop) {
     super(prop);
     this.registerDefaultState(this.stateDefinition.any().setValue(WATERLOGGED, false).setValue(HORIZONTAL_FACING, Direction.NORTH).setValue(FACE, AttachFace.WALL));
   }
 
-  boolean sneakPlayerAvoid = true;
+  @Override
+  public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    return new TileCreeperTrap(pos, state);
+  }
 
   @Override
   @SuppressWarnings("deprecation")
@@ -68,7 +74,9 @@ public class CreeperTrap extends BlockFlib implements SimpleWaterloggedBlock {
 
   public static final Predicate<Entity> DYE_FINDER = (p) -> {
     return p.isAlive() && p instanceof ItemEntity
-        && ((ItemEntity) p).getItem().getItem() instanceof DyeItem;
+        && ((ItemEntity) p).getItem().getCount() > 0
+    //        && ((ItemEntity) p).getItem().getItem() instanceof DyeItem
+    ;
   };
 
   @Override
@@ -89,7 +97,12 @@ public class CreeperTrap extends BlockFlib implements SimpleWaterloggedBlock {
       //
       //
       ItemEntity dyeFound = null;
-      for (Entity entityItemDye : level.getEntities((Entity) null, ab, DYE_FINDER)) {
+      for (Entity entityItemDye : level.getEntities(alive, ab, DYE_FINDER)) {
+        boolean recipeFound = false;
+        for (ExplosionRecipe recipe : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.EXPLOSION_RECIPE.get())) {
+          //          if (recipe.matches(entityItemDye.get)) {}
+          //
+        }
         System.out.println("dye found for entity" + entityItemDye);
         final ItemEntity itemEntity = (ItemEntity) entityItemDye;
         DyeItem dye = (DyeItem) itemEntity.getItem().getItem();
