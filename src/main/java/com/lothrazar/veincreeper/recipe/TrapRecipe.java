@@ -32,6 +32,9 @@ public class TrapRecipe implements Recipe<Container> {
   private ResourceLocation outputEntity;
   CompoundTag inputTags = new CompoundTag();
   CompoundTag outputTags = new CompoundTag();
+  //TODO: 
+  private EntityIngredient yes;
+  private EntityIngredient please;
 
   public TrapRecipe(ResourceLocation id, Ingredient ing, ResourceLocation entityType, ResourceLocation entityOut, CompoundTag tag, CompoundTag tago) {
     super();
@@ -118,6 +121,7 @@ public class TrapRecipe implements Recipe<Container> {
     }
 
     private void mapJsonOntoTag(JsonObject json, CompoundTag tagMutable) {
+      //if there are no keys, or no checks put anything into the mutable tag, then it remains empty, so check .isEmpty()
       for (String key : json.keySet()) {
         JsonElement el = json.get(key);
         if (el instanceof JsonPrimitive p) {
@@ -131,7 +135,8 @@ public class TrapRecipe implements Recipe<Container> {
             tagMutable.putString(key, p.getAsString());
           }
           else {
-            System.out.println("Sorry, nested NBT/complex values currently not supported");
+            VeinCreeperMod.LOGGER.error("Sorry, nested NBT/complex values currently not supported yet. use boolean true/false, or whole numbers or strings");
+            VeinCreeperMod.LOGGER.error(key + "=" + el);
           }
         }
       }
@@ -139,11 +144,12 @@ public class TrapRecipe implements Recipe<Container> {
 
     @Override
     public TrapRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-      var in = Ingredient.fromNetwork(buffer);
-      var target = buffer.readResourceLocation();
-      var entity = buffer.readResourceLocation();
-      var nbt = buffer.readNbt();
-      TrapRecipe r = new TrapRecipe(recipeId, in, target, entity, buffer.readNbt(), buffer.readNbt());
+      var inputIngredient = Ingredient.fromNetwork(buffer);
+      var inputEnt = buffer.readResourceLocation();
+      var inputTag = buffer.readNbt();
+      var outEnt = buffer.readResourceLocation();
+      var outTag = buffer.readNbt();
+      TrapRecipe r = new TrapRecipe(recipeId, inputIngredient, inputEnt, outEnt, inputTag, outTag);
       //server reading recipe from client or vice/versa 
       return r;
     }
@@ -152,8 +158,8 @@ public class TrapRecipe implements Recipe<Container> {
     public void toNetwork(FriendlyByteBuf buffer, TrapRecipe recipe) {
       recipe.input.toNetwork(buffer);
       buffer.writeResourceLocation(recipe.inputEntity);
-      buffer.writeResourceLocation(recipe.outputEntity);
       buffer.writeNbt(recipe.inputTags);
+      buffer.writeResourceLocation(recipe.outputEntity);
       buffer.writeNbt(recipe.outputTags);
     }
   }
@@ -167,35 +173,35 @@ public class TrapRecipe implements Recipe<Container> {
       entity.saveWithoutId(entityData);
       for (String key : this.inputTags.getAllKeys()) {
         if (inputTags.getTagType(key) == Tag.TAG_INT) {
-          System.out.println(key + "COMPARE input int  = " + inputTags.getInt(key) + " VS " + entityData.getInt(key));
+          VeinCreeperMod.LOGGER.info(key + "COMPARE input int  = " + inputTags.getInt(key) + " VS " + entityData.getInt(key));
           tagMatch = (inputTags.getInt(key) == entityData.getInt(key));
           matches = matches && tagMatch;
           if (!tagMatch) {
-            System.out.println("FAILED integer tagmatch from recipe " + entityData);
+            VeinCreeperMod.LOGGER.info("FAILED integer tagmatch from recipe " + entityData);
           }
         }
         if (inputTags.getTagType(key) == Tag.TAG_SHORT) {
-          System.out.println("getShort" + inputTags.getShort(key));
+          VeinCreeperMod.LOGGER.info("getShort" + inputTags.getShort(key));
           tagMatch = (inputTags.getShort(key) == entityData.getShort(key));
           matches = matches && tagMatch;
           if (!tagMatch) {
-            System.out.println("FAILED getShort tagmatch from recipe " + inputTags);
+            VeinCreeperMod.LOGGER.info("FAILED getShort tagmatch from recipe " + inputTags);
           }
         }
         if (inputTags.getTagType(key) == Tag.TAG_BYTE) {
-          System.out.println("boolinput tags  " + inputTags.getBoolean(key) + "  vs " + entityData.getBoolean(key));
+          VeinCreeperMod.LOGGER.info("boolinput tags  " + inputTags.getBoolean(key) + "  vs " + entityData.getBoolean(key));
           tagMatch = (inputTags.getBoolean(key) == entityData.getBoolean(key));
           matches = matches && tagMatch;
           if (!tagMatch) {
-            System.out.println("FAILED boolean tagmatch from recipe " + inputTags);
+            VeinCreeperMod.LOGGER.info("FAILED boolean tagmatch from recipe " + inputTags);
           }
         }
         if (inputTags.getTagType(key) == Tag.TAG_STRING) {
-          System.out.println("STR " + inputTags.getString(key));
+          VeinCreeperMod.LOGGER.info("STR " + inputTags.getString(key));
           tagMatch = (inputTags.getString(key).equalsIgnoreCase(entityData.getString(key)));
           matches = matches && tagMatch;
           if (!tagMatch) {
-            System.out.println("FAILED string tagmatch from recipe " + inputTags);
+            VeinCreeperMod.LOGGER.info("FAILED string tagmatch from recipe " + inputTags);
           }
         }
       }
@@ -204,47 +210,44 @@ public class TrapRecipe implements Recipe<Container> {
   }
 
   public void spawnEntityResult(ServerLevel level, BlockPos pos, Entity entityToKill) {
-    //gogogo 
-    //          c.setPos(pos.getCenter());
-    //          level.addFreshEntity(c);
-    //does the recipe match? yes? ok
-    //is it single use?
-    //          level.destroyBlock(pos, true);
-    //
-    var trapped = ForgeRegistries.ENTITY_TYPES.getValue(this.outputEntity);
+    //TODO: target "minecraft:player" ???
+    var entityFromRecipe = ForgeRegistries.ENTITY_TYPES.getValue(this.outputEntity);
+    if (entityFromRecipe == null) {
+      VeinCreeperMod.LOGGER.error("Recipe spawn failed, entity not registered " + entityFromRecipe);
+    }
     //
     Entity entity;
     if (this.inputEntity.equals(this.outputEntity)) {
-      System.out.println("haha haxor keep same entity dont make a new one duh");
+      VeinCreeperMod.LOGGER.info("haha haxor keep same entity dont make a new one duh");
       entity = entityToKill;// just edit the fucker
     }
     else {
       //ok normal flow
-      entity = trapped.spawn(level, pos, MobSpawnType.CONVERSION);
+      entity = entityFromRecipe.spawn(level, pos, MobSpawnType.CONVERSION);
     }
-    System.out.println("spawnEntityResult " + this.outputTags);
+    VeinCreeperMod.LOGGER.info("spawnEntityResult " + this.outputTags);
     if (!this.outputTags.isEmpty()) {
       CompoundTag entityData = new CompoundTag(); // bullshit what it isentity.getPersistentData();
       entity.saveWithoutId(entityData);
       for (String key : this.outputTags.getAllKeys()) {
         if (inputTags.getTagType(key) == Tag.TAG_INT) {
-          System.out.println("WRITE int//short spawning " + outputTags.getInt(key));
+          VeinCreeperMod.LOGGER.info("WRITE int//short spawning " + outputTags.getInt(key));
           entity.getPersistentData().putInt(key, outputTags.getInt(key));
         }
         if (inputTags.getTagType(key) == Tag.TAG_BYTE) {
-          System.out.println("WRITE bool " + outputTags.getBoolean(key));
+          VeinCreeperMod.LOGGER.info("WRITE bool " + outputTags.getBoolean(key));
           entity.getPersistentData().putBoolean(key, outputTags.getBoolean(key));
         }
         if (inputTags.getTagType(key) == Tag.TAG_STRING) {
-          System.out.println("WRITE STR " + outputTags.getString(key));
+          VeinCreeperMod.LOGGER.info("WRITE STR " + outputTags.getString(key));
           entity.getPersistentData().putString(key, outputTags.getString(key));
         }
       }
-      System.out.println("actually load nbt");
+      VeinCreeperMod.LOGGER.info("actually load nbt into entityData=" + entityData);
       entity.load(entityData);
     }
     else {
-      System.out.println("output tags empty" + this.id);
+      VeinCreeperMod.LOGGER.info("output tags empty for recipe " + this.id);
     }
   }
 }

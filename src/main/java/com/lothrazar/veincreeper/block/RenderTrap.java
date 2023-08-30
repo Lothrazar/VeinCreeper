@@ -21,7 +21,6 @@ public class RenderTrap implements BlockEntityRenderer<TileCreeperTrap> {
     if (itemHandler != null) {
       ItemStack stack = itemHandler.getStackInSlot(0);
       if (!stack.isEmpty()) {
-        System.out.println("RENDER TRAP " + stack);
         matrixStack.pushPose();
         matrixStack.translate(0.5F, 0.44921875F, 0.5F);
         matrixStack.scale(0.375F, 0.375F, 0.375F);

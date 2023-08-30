@@ -3,12 +3,14 @@ package com.lothrazar.veincreeper.block;
 import java.util.function.Predicate;
 import com.lothrazar.library.block.EntityBlockFlib;
 import com.lothrazar.veincreeper.CreeperRegistry;
+import com.lothrazar.veincreeper.VeinCreeperMod;
 import com.lothrazar.veincreeper.recipe.TrapRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -36,28 +38,21 @@ public class CreeperTrap extends EntityBlockFlib implements SimpleWaterloggedBlo
 
   public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
   public static final DirectionProperty HORIZONTAL_FACING = BlockStateProperties.HORIZONTAL_FACING;
-  public static final EnumProperty<AttachFace> FACE = BlockStateProperties.ATTACH_FACE;
-  protected static final VoxelShape AABB_CEILING_X_OFF = Block.box(0.0D, 14.0D, 0.0D,
-      16.0D, 16.0D, 16.0D);
-  protected static final VoxelShape AABB_CEILING_Z_OFF = Block.box(5.0D, 14.0D, 6.0D,
-      11.0D, 16.0D, 10.0D);
-  protected static final VoxelShape AABB_FLOOR_X_OFF = Block.box(0.0D, 0.0D, 0.0D,
-      16.0D, 2.0D, 16.0D);
-  protected static final VoxelShape AABB_FLOOR_Z_OFF = Block.box(0.0D, 0.0D, 0.0D,
-      16.0D, 2.0D, 16.0D);
-  protected static final VoxelShape AABB_NORTH_OFF = Block.box(0.0D, 0.0D, 14.0D,
-      16.0D, 16.0D, 16.0D);
-  protected static final VoxelShape AABB_SOUTH_OFF = Block.box(0.0D, 0.0D, 0.0D,
-      16.0D, 16.0D, 2.0D);
-  protected static final VoxelShape AABB_WEST_OFF = Block.box(14.0D, 0.0D, 0.0D,
-      16.0D, 16.0D, 16.0D);
-  protected static final VoxelShape AABB_EAST_OFF = Block.box(0.0D, 0.0D, 0.0D,
-      2.0D, 16.0D, 16.0D);
+  public static final EnumProperty<AttachFace> ATTACH_FACE = BlockStateProperties.ATTACH_FACE;
+  protected static final VoxelShape AABB_CEILING_X = Block.box(0.0D, 14.0D, 0.0D, 16.0D, 16.0D, 16.0D);
+  protected static final VoxelShape AABB_CEILING_Z = Block.box(5.0D, 14.0D, 6.0D, 11.0D, 16.0D, 10.0D);
+  protected static final VoxelShape AABB_FLOOR_X = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D);
+  protected static final VoxelShape AABB_FLOOR_Z = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D);
+  protected static final VoxelShape AABB_NORTH = Block.box(0.0D, 0.0D, 14.0D, 16.0D, 16.0D, 16.0D);
+  protected static final VoxelShape AABB_SOUTH = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 2.0D);
+  protected static final VoxelShape AABB_WEST = Block.box(14.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D);
+  protected static final VoxelShape AABB_EAST = Block.box(0.0D, 0.0D, 0.0D, 2.0D, 16.0D, 16.0D);
   boolean sneakPlayerAvoid = true;
+  private boolean requiresRedstoneSignal = false;
 
   public CreeperTrap(Properties prop) {
     super(prop);
-    this.registerDefaultState(this.stateDefinition.any().setValue(WATERLOGGED, false).setValue(HORIZONTAL_FACING, Direction.NORTH).setValue(FACE, AttachFace.WALL));
+    this.registerDefaultState(this.stateDefinition.any().setValue(WATERLOGGED, false).setValue(HORIZONTAL_FACING, Direction.NORTH).setValue(ATTACH_FACE, AttachFace.WALL));
   }
 
   @Override
@@ -84,54 +79,60 @@ public class CreeperTrap extends EntityBlockFlib implements SimpleWaterloggedBlo
       return;
     }
     //are you alive instanceof LivingEntity alive
+    if (this.requiresRedstoneSignal && !level.hasNeighborSignal(pos)) {
+      return; //i need signal to work, and there aint one
+    }
+    //else i dont need it. (or i do and i has it))
+    BlockEntity blockEntity = level.getBlockEntity(pos);
     if (!level.isClientSide &&
-        level.hasNeighborSignal(pos) &&
-        level.getBlockEntity(pos) instanceof TileCreeperTrap) {
-      var caps = level.getBlockEntity(pos).getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
-      //
+        blockEntity instanceof TileCreeperTrap) {
+      var caps = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+      if (caps == null) {
+        return;
+      }
       ItemStack dyeFound = caps.getStackInSlot(0);
       for (TrapRecipe recipe : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.RECIPE_TRAP.get())) {
-        // 
         if (recipe.matches(level, dyeFound, entity)) {
-          System.out.println(dyeFound + "Found  match " + entity + " vs recipe" + recipe.toString());
-          //pay cost 
+          VeinCreeperMod.LOGGER.info(dyeFound + "Found  match " + entity + " vs recipe" + recipe.toString());
           //give result
-          recipe.spawnEntityResult((ServerLevel) level, pos, entity);
+          recipe.spawnEntityResult((ServerLevel) level, pos, entity); //pay cost 
           dyeFound.shrink(1);
+          if (entity instanceof Player == false) {
+            entity.remove(RemovalReason.KILLED);
+          }
         }
       }
     }
-    if (entity instanceof Player) {}
   }
 
   @Override
   public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
     Direction direction = state.getValue(HORIZONTAL_FACING);
-    switch (state.getValue(FACE)) {
+    switch (state.getValue(ATTACH_FACE)) {
       case FLOOR:
         if (direction.getAxis() == Direction.Axis.X) {
-          return AABB_FLOOR_X_OFF;
+          return AABB_FLOOR_X;
         }
-        return AABB_FLOOR_Z_OFF;
+        return AABB_FLOOR_Z;
       case WALL:
         switch (direction) {
           case EAST:
-            return AABB_EAST_OFF;
+            return AABB_EAST;
           case WEST:
-            return AABB_WEST_OFF;
+            return AABB_WEST;
           case SOUTH:
-            return AABB_SOUTH_OFF;
+            return AABB_SOUTH;
           case NORTH:
           default:
-            return AABB_NORTH_OFF;
+            return AABB_NORTH;
         }
       case CEILING:
       default:
         if (direction.getAxis() == Direction.Axis.X) {
-          return AABB_CEILING_X_OFF;
+          return AABB_CEILING_X;
         }
         else {
-          return AABB_CEILING_Z_OFF;
+          return AABB_CEILING_Z;
         }
     }
   }
@@ -141,10 +142,10 @@ public class CreeperTrap extends EntityBlockFlib implements SimpleWaterloggedBlo
     for (Direction direction : context.getNearestLookingDirections()) {
       BlockState blockstate;
       if (direction.getAxis() == Direction.Axis.Y) {
-        blockstate = this.defaultBlockState().setValue(FACE, direction == Direction.UP ? AttachFace.CEILING : AttachFace.FLOOR).setValue(HORIZONTAL_FACING, context.getHorizontalDirection());
+        blockstate = this.defaultBlockState().setValue(ATTACH_FACE, direction == Direction.UP ? AttachFace.CEILING : AttachFace.FLOOR).setValue(HORIZONTAL_FACING, context.getHorizontalDirection());
       }
       else {
-        blockstate = this.defaultBlockState().setValue(FACE, AttachFace.WALL).setValue(HORIZONTAL_FACING, direction.getOpposite());
+        blockstate = this.defaultBlockState().setValue(ATTACH_FACE, AttachFace.WALL).setValue(HORIZONTAL_FACING, direction.getOpposite());
       }
       if (blockstate.canSurvive(context.getLevel(), context.getClickedPos())) {
         return blockstate.setValue(WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).getType() == Fluids.WATER);
@@ -161,7 +162,7 @@ public class CreeperTrap extends EntityBlockFlib implements SimpleWaterloggedBlo
   @Override
   protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
     super.createBlockStateDefinition(builder);
-    builder.add(HORIZONTAL_FACING).add(FACE).add(WATERLOGGED);
+    builder.add(HORIZONTAL_FACING).add(ATTACH_FACE).add(WATERLOGGED);
   }
 
   @Override
