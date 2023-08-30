@@ -1,0 +1,14 @@
+{
+	"type": "veincreeper:trap",
+	"input": {
+		"item": "minecraft:bone"
+	},
+	"trappedEntity": {
+		"entity": "minecraft:horse",
+		"nbt": {"Tame": true}
+	},
+	"result": {
+		"entity": "minecraft:skeleton_horse",
+		"nbt": {"Tame": true, "Temper":1}
+	}
+}

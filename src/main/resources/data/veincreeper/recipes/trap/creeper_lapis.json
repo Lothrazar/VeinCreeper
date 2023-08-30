@@ -1,0 +1,19 @@
+{
+	"type": "veincreeper:trap",
+	"input": {
+		"tag": "forge:dyes/blue"
+	},
+	"trappedEntity": {
+		"entity": "minecraft:creeper",
+		"nbt":{"ignited": true} 
+	},
+	"result": {
+		"entity": "veincreeper:lapis_creeper"
+	},
+	"conditions": [
+		{
+			"type": "flib:entity_exists",
+			"value": "veincreeper:lapis_creeper"
+		}
+	]
+}

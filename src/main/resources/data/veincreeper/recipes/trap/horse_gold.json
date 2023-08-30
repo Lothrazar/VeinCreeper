@@ -1,0 +1,14 @@
+{
+	"type": "veincreeper:trap",
+	"input": {
+		"tag": "forge:nuggets/gold"
+	},
+	"trappedEntity": {
+		"entity": "minecraft:horse",
+		"nbt": {"Tame": false}
+	},
+	"result": {
+		"entity": "minecraft:zombie_horse",
+		"nbt": {"Temper": 2, "CanPickupLoot":false, "LeftHanded":true}
+	}
+}

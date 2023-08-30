@@ -1,0 +1,14 @@
+{
+	"type": "veincreeper:trap",
+	"input": {
+		"input": "minecraft:ghast_tear"
+	},
+	"trappedEntity": {
+		"entity": "minecraft:creeper",
+		"nbt":{"powered": false} 
+	},
+	"result": {
+		"entity": "minecraft:creeper",
+		"nbt":{"powered": true} 
+	}
+}

@@ -9,9 +9,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -33,7 +31,6 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class CreeperTrap extends EntityBlockFlib implements SimpleWaterloggedBlock {
 
@@ -89,27 +86,18 @@ public class CreeperTrap extends EntityBlockFlib implements SimpleWaterloggedBlo
     //are you alive instanceof LivingEntity alive
     if (!level.isClientSide &&
         level.hasNeighborSignal(pos) &&
-        level.getBlockEntity(pos) instanceof TileCreeperTrap &&
-        entity instanceof Creeper alive) {
+        level.getBlockEntity(pos) instanceof TileCreeperTrap) {
       var caps = level.getBlockEntity(pos).getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
       //
       ItemStack dyeFound = caps.getStackInSlot(0);
       for (TrapRecipe recipe : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.RECIPE_TRAP.get())) {
         // 
-        System.out.println(dyeFound + "Test match " + entity + " vs recipe");
         if (recipe.matches(level, dyeFound, entity)) {
-          //gogogo 
-          //          c.setPos(pos.getCenter());
-          //          level.addFreshEntity(c);
-          //does the recipe match? yes? ok
-          alive.remove(Entity.RemovalReason.KILLED); // .kill();
+          System.out.println(dyeFound + "Found  match " + entity + " vs recipe" + recipe.toString());
+          //pay cost 
+          //give result
+          recipe.spawnEntityResult((ServerLevel) level, pos, entity);
           dyeFound.shrink(1);
-          //is it single use?
-          //          level.destroyBlock(pos, true);
-          //
-          var trapped = ForgeRegistries.ENTITY_TYPES.getValue(recipe.getTransformedEntity());
-          //
-          trapped.spawn((ServerLevel) level, pos, MobSpawnType.CONVERSION);
         }
       }
     }
