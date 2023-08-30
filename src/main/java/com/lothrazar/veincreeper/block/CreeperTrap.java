@@ -10,7 +10,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -97,9 +96,6 @@ public class CreeperTrap extends EntityBlockFlib implements SimpleWaterloggedBlo
           //give result
           recipe.spawnEntityResult((ServerLevel) level, pos, entity); //pay cost 
           dyeFound.shrink(1);
-          if (entity instanceof Player == false) {
-            entity.remove(RemovalReason.KILLED);
-          }
         }
       }
     }

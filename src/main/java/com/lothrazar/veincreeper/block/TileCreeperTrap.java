@@ -1,10 +1,10 @@
 package com.lothrazar.veincreeper.block;
 
+import com.lothrazar.library.entity.BlockEntityFlib;
 import com.lothrazar.veincreeper.CreeperRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -12,7 +12,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class TileCreeperTrap extends BlockEntity {
+public class TileCreeperTrap extends BlockEntityFlib {
 
   public static final String NBTINV = "inv";
   private ItemStackHandler inventory = new ItemStackHandler(1);
@@ -20,6 +20,12 @@ public class TileCreeperTrap extends BlockEntity {
 
   public TileCreeperTrap(BlockPos pos, BlockState state) {
     super(CreeperRegistry.TRAP_TILE.get(), pos, state);
+  }
+
+  @Override
+  public void invalidateCaps() {
+    inventoryCap.invalidate();
+    super.invalidateCaps();
   }
 
   @Override
@@ -41,4 +47,12 @@ public class TileCreeperTrap extends BlockEntity {
     }
     return super.getCapability(cap, side);
   }
+
+  @Override
+  public int getField(int k) {
+    return 0;
+  }
+
+  @Override
+  public void setField(int k, int val) {}
 }

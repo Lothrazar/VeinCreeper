@@ -15,7 +15,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
@@ -193,7 +195,7 @@ public class TrapRecipe implements Recipe<Container> {
           tagMatch = (inputTags.getBoolean(key) == entityData.getBoolean(key));
           matches = matches && tagMatch;
           if (!tagMatch) {
-            VeinCreeperMod.LOGGER.info("FAILED boolean tagmatch from recipe " + inputTags);
+            VeinCreeperMod.LOGGER.info(id + "FAILED boolean tagmatch from recipe " + inputTags);
           }
         }
         if (inputTags.getTagType(key) == Tag.TAG_STRING) {
@@ -223,24 +225,30 @@ public class TrapRecipe implements Recipe<Container> {
     }
     else {
       //ok normal flow
+      VeinCreeperMod.LOGGER.info("spawn New entity from type  " + entityFromRecipe);
       entity = entityFromRecipe.spawn(level, pos, MobSpawnType.CONVERSION);
+      if (entity instanceof Player == false) {
+        VeinCreeperMod.LOGGER.info("kill and remove enitty" + entityToKill);
+        entityToKill.remove(RemovalReason.KILLED);
+      }
     }
     VeinCreeperMod.LOGGER.info("spawnEntityResult " + this.outputTags);
     if (!this.outputTags.isEmpty()) {
+      //extract data. edit and push it back in
       CompoundTag entityData = new CompoundTag(); // bullshit what it isentity.getPersistentData();
-      entity.saveWithoutId(entityData);
+      entity.save(entityData); //save WITH ID?
       for (String key : this.outputTags.getAllKeys()) {
         if (inputTags.getTagType(key) == Tag.TAG_INT) {
           VeinCreeperMod.LOGGER.info("WRITE int//short spawning " + outputTags.getInt(key));
-          entity.getPersistentData().putInt(key, outputTags.getInt(key));
+          entityData.putInt(key, outputTags.getInt(key));
         }
         if (inputTags.getTagType(key) == Tag.TAG_BYTE) {
           VeinCreeperMod.LOGGER.info("WRITE bool " + outputTags.getBoolean(key));
-          entity.getPersistentData().putBoolean(key, outputTags.getBoolean(key));
+          entityData.putBoolean(key, outputTags.getBoolean(key));
         }
         if (inputTags.getTagType(key) == Tag.TAG_STRING) {
           VeinCreeperMod.LOGGER.info("WRITE STR " + outputTags.getString(key));
-          entity.getPersistentData().putString(key, outputTags.getString(key));
+          entityData.putString(key, outputTags.getString(key));
         }
       }
       VeinCreeperMod.LOGGER.info("actually load nbt into entityData=" + entityData);
