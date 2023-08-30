@@ -13,6 +13,7 @@ import com.lothrazar.veincreeper.recipe.ExplosionRecipe.SerializePartyRecipe;
 import com.lothrazar.veincreeper.recipe.TrapRecipe;
 import com.lothrazar.veincreeper.recipe.TrapRecipe.SerializeTrapRecipe;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityType.Builder;
 import net.minecraft.world.entity.MobCategory;
@@ -77,5 +78,10 @@ public class CreeperRegistry {
     for (var c : CREEPERS.values()) {
       event.registerEntityRenderer(c.getEntityType(), VeinCreeperRender::new);
     }
+  }
+
+  public static EntityType getCreeper(ResourceLocation transformedEntity) {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

@@ -3,16 +3,17 @@ package com.lothrazar.veincreeper.block;
 import java.util.function.Predicate;
 import com.lothrazar.library.block.EntityBlockFlib;
 import com.lothrazar.veincreeper.CreeperRegistry;
-import com.lothrazar.veincreeper.entity.VeinCreeper;
-import com.lothrazar.veincreeper.recipe.ExplosionRecipe;
+import com.lothrazar.veincreeper.recipe.TrapRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Containers;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
@@ -29,9 +30,10 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class CreeperTrap extends EntityBlockFlib implements SimpleWaterloggedBlock {
 
@@ -85,43 +87,30 @@ public class CreeperTrap extends EntityBlockFlib implements SimpleWaterloggedBlo
       return;
     }
     //are you alive instanceof LivingEntity alive
-    System.out.println("d   level.getSignal(pos, Direction.DOWN) y" + level.hasNeighborSignal(pos));
     if (!level.isClientSide &&
         level.hasNeighborSignal(pos) &&
-        //        level.getSignal(pos, Direction.DOWN) > 0 && // TODO offset direction
+        level.getBlockEntity(pos) instanceof TileCreeperTrap &&
         entity instanceof Creeper alive) {
-      final BlockPos target = new BlockPos(pos);
-      final int r = 1; // TODO radius controls in GUI
-      AABB ab = new AABB(target.getX() + r, target.getY(), target.getZ() + r,
-          target.getX() - r, target.getY() + 1, target.getZ() - r);
+      var caps = level.getBlockEntity(pos).getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
       //
-      //
-      ItemEntity dyeFound = null;
-      for (Entity entityItemDye : level.getEntities(alive, ab, DYE_FINDER)) {
-        boolean recipeFound = false;
-        for (ExplosionRecipe recipe : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.EXPLOSION_RECIPE.get())) {
-          //          if (recipe.matches(entityItemDye.get)) {}
+      ItemStack dyeFound = caps.getStackInSlot(0);
+      for (TrapRecipe recipe : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.RECIPE_TRAP.get())) {
+        // 
+        System.out.println(dyeFound + "Test match " + entity + " vs recipe");
+        if (recipe.matches(level, dyeFound, entity)) {
+          //gogogo 
+          //          c.setPos(pos.getCenter());
+          //          level.addFreshEntity(c);
+          //does the recipe match? yes? ok
+          alive.remove(Entity.RemovalReason.KILLED); // .kill();
+          dyeFound.shrink(1);
+          //is it single use?
+          //          level.destroyBlock(pos, true);
           //
+          var trapped = ForgeRegistries.ENTITY_TYPES.getValue(recipe.getTransformedEntity());
+          //
+          trapped.spawn((ServerLevel) level, pos, MobSpawnType.CONVERSION);
         }
-        System.out.println("dye found for entity" + entityItemDye);
-        final ItemEntity itemEntity = (ItemEntity) entityItemDye;
-        DyeItem dye = (DyeItem) itemEntity.getItem().getItem();
-        if (dye.getDyeColor() == DyeColor.RED) {
-          //match recipe on color
-          dyeFound = itemEntity;
-          break;
-        }
-      }
-      if (dyeFound != null) {
-        System.out.println("hax found for entity" + dyeFound);
-        var creeper = CreeperRegistry.CREEPERS.get("diamond_creeper");
-        var c = new VeinCreeper(creeper.getEntityType(), level);
-        c.setPos(pos.getCenter());
-        level.addFreshEntity(c);
-        //does the recipe match? yes? ok
-        alive.remove(Entity.RemovalReason.KILLED); // .kill();
-        dyeFound.getItem().shrink(1);
-        level.destroyBlock(target, true);
       }
     }
     if (entity instanceof Player) {}
@@ -185,5 +174,20 @@ public class CreeperTrap extends EntityBlockFlib implements SimpleWaterloggedBlo
   protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
     super.createBlockStateDefinition(builder);
     builder.add(HORIZONTAL_FACING).add(FACE).add(WATERLOGGED);
+  }
+
+  @Override
+  public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+    if (state.getBlock() != newState.getBlock()) {
+      BlockEntity tileentity = worldIn.getBlockEntity(pos);
+      if (tileentity instanceof TileCreeperTrap grinder) {
+        var cap = tileentity.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+        for (int i = 0; i < cap.getSlots(); ++i) {
+          Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), cap.getStackInSlot(i));
+        }
+        worldIn.updateNeighbourForOutputSignal(pos, this);
+      }
+      super.onRemove(state, worldIn, pos, newState, isMoving);
+    }
   }
 }

@@ -8,17 +8,19 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class TrapRecipe implements Recipe<Container> {
 
   private final ResourceLocation id;
-  private Ingredient itemOnGround; // Items.RED_DYE 
+  private Ingredient input; // Items.RED_DYE 
   private ResourceLocation trappedEntity;
   private ResourceLocation transformedEntity;
   String nbt = null;
@@ -26,9 +28,9 @@ public class TrapRecipe implements Recipe<Container> {
   public TrapRecipe(ResourceLocation id, Ingredient ing, ResourceLocation entityType, ResourceLocation entityOut) {
     super();
     this.id = id;
-    this.itemOnGround = ing;
+    this.input = ing;
     this.trappedEntity = entityType;
-    this.transformedEntity = entityOut;
+    this.setTransformedEntity(entityOut);
   }
 
   @Override
@@ -77,10 +79,10 @@ public class TrapRecipe implements Recipe<Container> {
     @Override
     public TrapRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
       try {
-        Ingredient itemOnGround = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "itemOnGround"));
-        String trappedEntity = json.get("trappedEntity").getAsJsonObject().get("id").getAsString();
-        String transformedEntity = json.get("transformedEntity").getAsJsonObject().get("id").getAsString();
-        VeinCreeperMod.LOGGER.debug("SUCCESS loading trap recipe  " + recipeId);
+        Ingredient itemOnGround = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
+        String trappedEntity = json.get("trappedEntity").getAsJsonObject().get("entity").getAsString();
+        String transformedEntity = json.get("result").getAsJsonObject().get("entity").getAsString();
+        VeinCreeperMod.LOGGER.debug(" loading trap recipe  " + recipeId);
         return new TrapRecipe(recipeId, itemOnGround, new ResourceLocation(trappedEntity), new ResourceLocation(transformedEntity));
       }
       catch (Exception e) {
@@ -101,9 +103,24 @@ public class TrapRecipe implements Recipe<Container> {
 
     @Override
     public void toNetwork(FriendlyByteBuf buffer, TrapRecipe recipe) {
-      recipe.itemOnGround.toNetwork(buffer);
+      recipe.input.toNetwork(buffer);
       buffer.writeResourceLocation(recipe.trappedEntity);
-      buffer.writeResourceLocation(recipe.transformedEntity);
+      buffer.writeResourceLocation(recipe.getTransformedEntity());
     }
+  }
+
+  public boolean matches(Level level, ItemStack dyeFound, Entity entity) {
+    // TODO Auto-generated method stub
+    var trapped = ForgeRegistries.ENTITY_TYPES.getValue(trappedEntity);
+    return (trapped == entity.getType() && this.input.test(dyeFound));
+    //return false;
+  }
+
+  public ResourceLocation getTransformedEntity() {
+    return transformedEntity;
+  }
+
+  public void setTransformedEntity(ResourceLocation transformedEntity) {
+    this.transformedEntity = transformedEntity;
   }
 }
