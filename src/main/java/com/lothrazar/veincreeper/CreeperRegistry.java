@@ -13,12 +13,16 @@ import com.lothrazar.veincreeper.recipe.ExplosionRecipe.SerializePartyRecipe;
 import com.lothrazar.veincreeper.recipe.TrapRecipe;
 import com.lothrazar.veincreeper.recipe.TrapRecipe.SerializeTrapRecipe;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityType.Builder;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
@@ -37,6 +41,7 @@ import net.minecraftforge.registries.RegistryObject;
 public class CreeperRegistry {
 
   //  static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, VeinCreeperMod.MODID);
+  private static final ResourceKey<CreativeModeTab> TAB = ResourceKey.create(Registries.CREATIVE_MODE_TAB, new ResourceLocation(VeinCreeperMod.MODID, "tab"));
   static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, VeinCreeperMod.MODID);
   static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, VeinCreeperMod.MODID);
   static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, VeinCreeperMod.MODID);
@@ -60,6 +65,16 @@ public class CreeperRegistry {
     });
     event.register(Registries.ITEM, reg -> {
       reg.register("trap", new BlockItem(TRAP.get(), new Item.Properties()));
+    });
+    event.register(Registries.CREATIVE_MODE_TAB, helper -> {
+      helper.register(TAB, CreativeModeTab.builder().icon(() -> new ItemStack(TRAP.get()))
+          .title(Component.translatable("itemGroup." + VeinCreeperMod.MODID))
+          .displayItems((enabledFlags, populator) -> {
+            populator.accept(TRAP.get());
+            //            for (Item entry : EGGS) {
+            //              populator.accept(entry);
+            //            }
+          }).build());
     });
   }
 
