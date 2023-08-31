@@ -1,7 +1,7 @@
 {
 	"type": "veincreeper:trap",
 	"input": {
-		"tag": "forge:dyes/light_blue"
+		"item": "minecraft:diamond"
 	},
 	"trappedEntity": {
 		"entity": "minecraft:creeper",

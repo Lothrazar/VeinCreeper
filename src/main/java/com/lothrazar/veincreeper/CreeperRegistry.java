@@ -36,13 +36,12 @@ import net.minecraftforge.registries.RegistryObject;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CreeperRegistry {
 
+  //  static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, VeinCreeperMod.MODID);
   static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, VeinCreeperMod.MODID);
-  static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, VeinCreeperMod.MODID);
   static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, VeinCreeperMod.MODID);
   static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, VeinCreeperMod.MODID);
   static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, VeinCreeperMod.MODID);
   public static final RegistryObject<Block> TRAP = BLOCKS.register("trap", () -> new CreeperTrap(Block.Properties.of()));
-  public static final RegistryObject<Item> TRAP_ITEM = ITEMS.register("trap", () -> new BlockItem(TRAP.get(), new Item.Properties()));
   public static final RegistryObject<BlockEntityType<TileCreeperTrap>> TRAP_TILE = TILES.register("trap", () -> BlockEntityType.Builder.of(TileCreeperTrap::new, TRAP.get()).build(null));
   public static final RegistryObject<RecipeType<ExplosionRecipe>> EXPLOSION_RECIPE = RECIPE_TYPES.register("explosion", () -> new RecipeType<ExplosionRecipe>() {});
   public static final RegistryObject<SerializePartyRecipe> R_SERIALIZER = RECIPE_SERIALIZERS.register("explosion", SerializePartyRecipe::new);
@@ -58,6 +57,9 @@ public class CreeperRegistry {
       for (CreepType type : CREEPERS.values()) {
         createCreeper(reg, type);
       }
+    });
+    event.register(Registries.ITEM, reg -> {
+      reg.register("trap", new BlockItem(TRAP.get(), new Item.Properties()));
     });
   }
 

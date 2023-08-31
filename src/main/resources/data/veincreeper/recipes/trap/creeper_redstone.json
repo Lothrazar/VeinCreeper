@@ -1,0 +1,18 @@
+{
+	"type": "veincreeper:trap",
+	"input": {
+		"item": "minecraft:redstone"
+	},
+	"trappedEntity": {
+		"entity": "minecraft:creeper"
+	},
+	"result": {
+		"entity": "veincreeper:redstone_creeper"
+	},
+	"conditions": [
+		{
+			"type": "flib:entity_exists",
+			"value": "veincreeper:redstone_creeper"
+		}
+	]
+}

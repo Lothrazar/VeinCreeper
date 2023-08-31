@@ -1,18 +1,18 @@
 {
 	"type": "veincreeper:trap",
 	"input": {
-		"tag": "forge:dyes/red"
+		"item": "minecraft:emerald"
 	},
 	"trappedEntity": {
 		"entity": "minecraft:creeper"
 	},
 	"result": {
-		"entity": "veincreeper:redstone_creeper"
+		"entity": "veincreeper:emerald_creeper"
 	},
 	"conditions": [
 		{
 			"type": "flib:entity_exists",
-			"value": "veincreeper:redstone_creeper"
+			"value": "veincreeper:emerald_creeper"
 		}
 	]
 }

@@ -1,19 +1,20 @@
 {
 	"type": "veincreeper:trap",
 	"input": {
-		"item": "minecraft:lapis_lazuli"
+		"tag": "forge:dyes/purple"
 	},
 	"trappedEntity": {
 		"entity": "minecraft:creeper",
 		"nbt":{"ignited": true} 
 	},
 	"result": {
-		"entity": "veincreeper:lapis_creeper"
+		"entity": "veincreeper:purple_creeper",
+		"nbt":{"powered": true} 
 	},
 	"conditions": [
 		{
 			"type": "flib:entity_exists",
-			"value": "veincreeper:lapis_creeper"
+			"value": "veincreeper:purple_creeper"
 		}
 	]
 }

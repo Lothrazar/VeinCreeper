@@ -1,14 +1,14 @@
 {
 	"type": "veincreeper:trap",
 	"input": {
-		"item": "minecraft:ghast_tear"
+		"tag": "minecraft:dampens_vibrations"
 	},
 	"trappedEntity": {
 		"entity": "minecraft:creeper",
-		"nbt":{"powered": false, "OnGround":1} 
+		"nbt":{"ignited": true} 
 	},
 	"result": {
 		"entity": "minecraft:creeper",
-		"nbt":{"powered": true} 
+		"nbt":{"ignited": false} 
 	}
 }

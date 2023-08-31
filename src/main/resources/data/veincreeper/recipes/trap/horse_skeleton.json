@@ -5,7 +5,7 @@
 	},
 	"trappedEntity": {
 		"entity": "minecraft:horse",
-		"nbt": {"Tame": true}
+		"nbt": {"Tame": false}
 	},
 	"result": {
 		"entity": "minecraft:skeleton_horse",

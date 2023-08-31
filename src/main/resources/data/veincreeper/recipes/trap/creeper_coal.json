@@ -1,0 +1,18 @@
+{
+	"type": "veincreeper:trap",
+	"input": {
+		"item": "minecraft:coal"
+	},
+	"trappedEntity": {
+		"entity": "minecraft:creeper"
+	},
+	"result": {
+		"entity": "veincreeper:coal_creeper"
+	},
+	"conditions": [
+		{
+			"type": "flib:entity_exists",
+			"value": "veincreeper:coal_creeper"
+		}
+	]
+}

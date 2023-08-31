@@ -29,24 +29,16 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class TrapRecipe implements Recipe<Container> {
 
   private final ResourceLocation id;
-  private Ingredient input; // Items.RED_DYE 
-  private ResourceLocation inputEntity;
-  private ResourceLocation outputEntity;
-  CompoundTag inputTags = new CompoundTag();
-  CompoundTag outputTags = new CompoundTag();
-  //TODO: 
-  private EntityIngredient yes;
-  private EntityIngredient please;
+  private final Ingredient input;
+  private final EntityIngredient inputEntity;
+  private final EntityIngredient outputEntity;
 
   public TrapRecipe(ResourceLocation id, Ingredient ing, ResourceLocation entityType, ResourceLocation entityOut, CompoundTag tag, CompoundTag tago) {
     super();
     this.id = id;
     this.input = ing;
-    this.inputEntity = entityType;
-    this.outputEntity = entityOut;
-    this.inputTags = (tag == null ? new CompoundTag() : tag); //non-null
-    this.outputTags = (tago == null ? new CompoundTag() : tago); //non-null
-    VeinCreeperMod.LOGGER.error(id + " intag" + inputTags + "          ot  " + this.outputTags);
+    this.inputEntity = new EntityIngredient(entityType, tag);
+    this.outputEntity = new EntityIngredient(entityOut, tago);
   }
 
   @Override
@@ -86,7 +78,7 @@ public class TrapRecipe implements Recipe<Container> {
 
   @Override
   public String toString() {
-    return "TrapRecipe [id=" + id + ", input=" + input + ", inputEntity=" + inputEntity + ", outputEntity=" + outputEntity + ", inputTags=" + inputTags + ", outputTags=" + outputTags + "]";
+    return "TrapRecipe [id=" + id + ", input=" + input + ", inputEntity=" + inputEntity + ", outputEntity=" + outputEntity + "]";
   }
 
   public static class SerializeTrapRecipe implements RecipeSerializer<TrapRecipe> {
@@ -159,21 +151,22 @@ public class TrapRecipe implements Recipe<Container> {
     @Override
     public void toNetwork(FriendlyByteBuf buffer, TrapRecipe recipe) {
       recipe.input.toNetwork(buffer);
-      buffer.writeResourceLocation(recipe.inputEntity);
-      buffer.writeNbt(recipe.inputTags);
-      buffer.writeResourceLocation(recipe.outputEntity);
-      buffer.writeNbt(recipe.outputTags);
+      buffer.writeResourceLocation(recipe.inputEntity.getEntityId());
+      buffer.writeNbt(recipe.inputEntity.getNbt());
+      buffer.writeResourceLocation(recipe.outputEntity.getEntityId());
+      buffer.writeNbt(recipe.outputEntity.getNbt());
     }
   }
 
   public boolean matches(Level level, ItemStack dyeFound, Entity entity) {
-    var trapped = ForgeRegistries.ENTITY_TYPES.getValue(inputEntity);
+    var trapped = ForgeRegistries.ENTITY_TYPES.getValue(inputEntity.getEntityId());
     boolean matches = (trapped == entity.getType() && this.input.test(dyeFound));
-    if (matches && !this.inputTags.isEmpty()) {
+    if (matches && !this.inputEntity.getNbt().isEmpty()) {
       boolean tagMatch = false;
       CompoundTag entityData = new CompoundTag(); // bullshit what it isentity.getPersistentData();
       entity.saveWithoutId(entityData);
-      for (String key : this.inputTags.getAllKeys()) {
+      var inputTags = this.inputEntity.getNbt();
+      for (String key : inputTags.getAllKeys()) {
         if (inputTags.getTagType(key) == Tag.TAG_INT) {
           VeinCreeperMod.LOGGER.info(key + "COMPARE input int  = " + inputTags.getInt(key) + " VS " + entityData.getInt(key));
           tagMatch = (inputTags.getInt(key) == entityData.getInt(key));
@@ -213,13 +206,13 @@ public class TrapRecipe implements Recipe<Container> {
 
   public void spawnEntityResult(ServerLevel level, BlockPos pos, Entity entityToKill) {
     //TODO: target "minecraft:player" ???
-    var entityFromRecipe = ForgeRegistries.ENTITY_TYPES.getValue(this.outputEntity);
+    var entityFromRecipe = ForgeRegistries.ENTITY_TYPES.getValue(this.outputEntity.getEntityId());
     if (entityFromRecipe == null) {
       VeinCreeperMod.LOGGER.error("Recipe spawn failed, entity not registered " + entityFromRecipe);
     }
     //
     Entity entity;
-    if (this.inputEntity.equals(this.outputEntity)) {
+    if (this.inputEntity.getEntityId().equals(this.outputEntity.getEntityId())) {
       VeinCreeperMod.LOGGER.info("haha haxor keep same entity dont make a new one duh");
       entity = entityToKill;// just edit the fucker
     }
@@ -232,12 +225,14 @@ public class TrapRecipe implements Recipe<Container> {
         entityToKill.remove(RemovalReason.KILLED);
       }
     }
-    VeinCreeperMod.LOGGER.info("spawnEntityResult " + this.outputTags);
-    if (!this.outputTags.isEmpty()) {
+    VeinCreeperMod.LOGGER.info("spawnEntityResult " + this.outputEntity);
+    var inputTags = this.inputEntity.getNbt();
+    var outputTags = this.outputEntity.getNbt();
+    if (!outputTags.isEmpty()) {
       //extract data. edit and push it back in
       CompoundTag entityData = new CompoundTag(); // bullshit what it isentity.getPersistentData();
       entity.save(entityData); //save WITH ID?
-      for (String key : this.outputTags.getAllKeys()) {
+      for (String key : outputTags.getAllKeys()) {
         if (inputTags.getTagType(key) == Tag.TAG_INT) {
           VeinCreeperMod.LOGGER.info("WRITE int//short spawning " + outputTags.getInt(key));
           entityData.putInt(key, outputTags.getInt(key));

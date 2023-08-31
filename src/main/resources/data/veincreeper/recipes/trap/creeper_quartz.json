@@ -1,19 +1,20 @@
 {
 	"type": "veincreeper:trap",
 	"input": {
-		"item": "minecraft:lapis_lazuli"
+		"tag": "forge:quartz"
 	},
 	"trappedEntity": {
 		"entity": "minecraft:creeper",
 		"nbt":{"ignited": true} 
 	},
 	"result": {
-		"entity": "veincreeper:lapis_creeper"
+		"entity": "veincreeper:quartz_creeper",
+		"nbt":{"powered": true} 
 	},
 	"conditions": [
 		{
 			"type": "flib:entity_exists",
-			"value": "veincreeper:lapis_creeper"
+			"value": "veincreeper:quartz_creeper"
 		}
 	]
 }
