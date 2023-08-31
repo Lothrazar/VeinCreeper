@@ -34,7 +34,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
-import net.minecraftforge.registries.RegisterEvent.RegisterHelper;
 import net.minecraftforge.registries.RegistryObject;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -54,17 +53,24 @@ public class CreeperRegistry {
   public static final RegistryObject<SerializeTrapRecipe> TRAP_SERIALIZER = RECIPE_SERIALIZERS.register("trap", SerializeTrapRecipe::new);
   static Builder<VeinCreeper> BUILDER = EntityType.Builder.<VeinCreeper> of(VeinCreeper::new, MobCategory.MISC).sized(1.4F, 2.7F - 0.3F).clientTrackingRange(10);
   public static Map<String, CreepType> CREEPERS = new HashMap<>();
+  //  public static Map<String, Supplier<EntityType<VeinCreeper>>> EGG_HACKS = new HashMap<>();
 
   @SubscribeEvent
   public static void onRegistry(RegisterEvent event) {
     event.register(Registries.ENTITY_TYPE, reg -> {
       CreeperConfigManager.parseConfig();
       for (CreepType type : CREEPERS.values()) {
-        createCreeper(reg, type);
+        type.setEntityType(BUILDER.build(type.getId()));
+        reg.register(type.getId(), type.getEntityType());
+        type.hack = () -> type.getEntityType();
       }
     });
     event.register(Registries.ITEM, reg -> {
       reg.register("trap", new BlockItem(TRAP.get(), new Item.Properties()));
+      System.out.println("item registry test size of list" + CREEPERS.values());
+      for (CreepType type : CREEPERS.values()) {
+        System.out.println(type.getId() + ":::" + type.hack);
+      }
     });
     event.register(Registries.CREATIVE_MODE_TAB, helper -> {
       helper.register(TAB, CreativeModeTab.builder().icon(() -> new ItemStack(TRAP.get()))
@@ -76,11 +82,6 @@ public class CreeperRegistry {
             //            }
           }).build());
     });
-  }
-
-  private static void createCreeper(RegisterHelper<EntityType<?>> reg, CreepType type) {
-    type.setEntityType(BUILDER.build(type.getId()));
-    reg.register(type.getId(), type.getEntityType());
   }
 
   @SubscribeEvent
@@ -95,10 +96,5 @@ public class CreeperRegistry {
     for (var c : CREEPERS.values()) {
       event.registerEntityRenderer(c.getEntityType(), VeinCreeperRender::new);
     }
-  }
-
-  public static EntityType getCreeper(ResourceLocation transformedEntity) {
-    // TODO Auto-generated method stub
-    return null;
   }
 }

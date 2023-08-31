@@ -1,5 +1,6 @@
 package com.lothrazar.veincreeper.conf;
 
+import java.util.function.Supplier;
 import com.lothrazar.veincreeper.entity.VeinCreeper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
@@ -11,6 +12,7 @@ public class CreepType {
   private EntityType<VeinCreeper> entityType; //hold just for registries
   private String blockName;//for display name only
   private boolean shouldDropExperience;
+  public Supplier<EntityType<VeinCreeper>> hack;
 
   public CreepType(String id, int[] col, String blockName, boolean exp) {
     if (col.length != 4) {
