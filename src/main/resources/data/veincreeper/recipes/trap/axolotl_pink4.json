@@ -1,0 +1,14 @@
+{
+	"type": "veincreeper:trap",
+	"input": {
+		"tag": "forge:dyes/pink"
+	},
+	"trappedEntity": {
+		"entity": "minecraft:axolotl",
+		"nbt":{"Variant":4} 
+	},
+	"result": {
+		"entity": "minecraft:axolotl",
+		"nbt":{"Variant":0} 
+	}
+}

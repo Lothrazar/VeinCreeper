@@ -4,7 +4,8 @@
 		"item": "minecraft:emerald"
 	},
 	"trappedEntity": {
-		"entity": "minecraft:creeper"
+		"entity": "minecraft:creeper",
+		"nbt":{"OnGround":1} 
 	},
 	"result": {
 		"entity": "veincreeper:emerald_creeper"

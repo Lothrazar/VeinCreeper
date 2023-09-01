@@ -77,40 +77,45 @@ public class ExplosionOres extends Explosion {
         if (!blockstate.isAir()) {
           BlockPos blockpos1 = blockpos.immutable();
           this.level.getProfiler().push("explosion_blocks");
-          //overrides
-          boolean replaced = false;
+          //overrides 
           final String key = CreeperConfigManager.getKeyFromEntity(this.getExploder());
-          if (CreeperRegistry.CREEPERS.containsKey(key)) {
-            //itsa valid entity, so NOW check recipe
-            boolean recipeFound = false;
-            for (ExplosionRecipe recipe : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.EXPLOSION_RECIPE.get())) {
-              if (recipe.getEntityType().equals(key) && blockstate.is(recipe.getReplace())
-                  && recipe.getOreOutput() != null) {
-                recipeFound = true;
-                //BONUS? or normal
-                if (recipe.getBonus() != null && recipe.getBonusChance() > 0
-                    && (recipe.getBonusChance() / 100F) > level.random.nextDouble()) {
-                  //ok
-                  toReplace.put(blockpos, recipe.getBonus().defaultBlockState());
-                  VeinCreeperMod.LOGGER.info("Explosion recipe applied BONUS " + recipe.getId());
-                }
-                else {
-                  //default to always replace to non-bonus
-                  toReplace.put(blockpos, recipe.getOreOutput().defaultBlockState());
-                  VeinCreeperMod.LOGGER.info("Explosion recipe applied to world " + recipe.getId());
-                }
-                replaced = true;
-                break; // found a matching recipe for this block state, AND did a replacement
-              }
+          if (!CreeperRegistry.CREEPERS.containsKey(key)) {
+            VeinCreeperMod.LOGGER.info("Missing type from explosion " + key);
+            return;
+          }
+          var type = CreeperRegistry.CREEPERS.get(key);
+          //itsa valid entity, so NOW check recipe
+          boolean recipeFound = false;
+          for (ExplosionRecipe recipe : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.EXPLOSION_RECIPE.get())) {
+            if (!recipe.matches(this.getExploder(), blockstate)) {
+              continue;
             }
-            if (!recipeFound && this.getExploder() instanceof VeinCreeper) {
-              VeinCreeperMod.LOGGER.error("No recipe found for vein crreper. Make sure to create your own recipes when creepers are added to the config " + this.getExploder().getType());
+            recipeFound = true;
+            //BONUS? or normal
+            if (recipe.getBonus() != null && recipe.getBonusChance() > 0
+                && (recipe.getBonusChance() / 100F) > level.random.nextDouble()) {
+              //ok
+              toReplace.put(blockpos1, recipe.getBonus().defaultBlockState());
+              VeinCreeperMod.LOGGER.info("Explosion recipe applied BONUS " + recipe.getId());
             }
+            else {
+              //default to always replace to non-bonus
+              toReplace.put(blockpos1, recipe.getOreOutput().defaultBlockState());
+              VeinCreeperMod.LOGGER.info("Explosion recipe applied to world " + recipe.getId());
+            }
+            break; // found a matching recipe for this block state, AND did a replacement
+          }
+          if (!recipeFound && this.getExploder() instanceof VeinCreeper) {
+            VeinCreeperMod.LOGGER.error(blockstate + "No recipe found. Make sure to create your own recipes when creepers are added to the con: " + key);
+            //            VeinCreeperMod.LOGGER.error(" __________  " + blockstate);
+            //            VeinCreeperMod.LOGGER.error(" __________  " + key);
+            VeinCreeperMod.LOGGER.error(" __________  " + blockpos);
           }
           //          else
           //            VeinCreeperMod.LOGGER.error("ERROR! no valid oreconfigs found for mob " + key);
           //
-          if (!replaced && blockstate.canDropFromExplosion(this.level, blockpos, this)) {
+          if (!recipeFound && type.isDestructive() && blockstate.canDropFromExplosion(this.level, blockpos, this)) {
+            //regular explosm stuff on non-converted blocks
             if (this.level instanceof ServerLevel serverlevel) {
               BlockEntity blockentity = blockstate.hasBlockEntity() ? this.level.getBlockEntity(blockpos) : null;
               LootParams.Builder lootparams$builder = (new LootParams.Builder(serverlevel)).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockpos)).withParameter(LootContextParams.TOOL, ItemStack.EMPTY).withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockentity).withOptionalParameter(LootContextParams.THIS_ENTITY,
@@ -124,7 +129,7 @@ public class ExplosionOres extends Explosion {
               });
             }
           }
-          if (!replaced) blockstate.onBlockExploded(this.level, blockpos, this);
+          if (!recipeFound && type.isDestructive()) blockstate.onBlockExploded(this.level, blockpos, this);
           this.level.getProfiler().pop();
         }
       }

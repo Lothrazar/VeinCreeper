@@ -11,12 +11,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 
-public class RenderTrap implements BlockEntityRenderer<TileCreeperTrap> {
+public class RenderMobTrap implements BlockEntityRenderer<TileMobTrap> {
 
-  public RenderTrap(BlockEntityRendererProvider.Context d) {}
+  public RenderMobTrap(BlockEntityRendererProvider.Context d) {}
 
   @Override
-  public void render(TileCreeperTrap tile, float v, PoseStack matrixStack, MultiBufferSource buffer, int light, int overlayLight) {
+  public void render(TileMobTrap tile, float v, PoseStack matrixStack, MultiBufferSource buffer, int light, int overlayLight) {
     IItemHandler itemHandler = tile.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
     if (itemHandler != null) {
       ItemStack stack = itemHandler.getStackInSlot(0);

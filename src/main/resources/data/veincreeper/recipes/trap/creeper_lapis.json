@@ -5,7 +5,7 @@
 	},
 	"trappedEntity": {
 		"entity": "minecraft:creeper",
-		"nbt":{"ignited": true} 
+		"nbt":{"OnGround":1} 
 	},
 	"result": {
 		"entity": "veincreeper:lapis_creeper"

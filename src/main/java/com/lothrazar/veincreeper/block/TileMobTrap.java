@@ -12,13 +12,13 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class TileCreeperTrap extends BlockEntityFlib {
+public class TileMobTrap extends BlockEntityFlib {
 
   public static final String NBTINV = "inv";
   private ItemStackHandler inventory = new ItemStackHandler(1);
   private LazyOptional<IItemHandler> inventoryCap = LazyOptional.of(() -> inventory);
 
-  public TileCreeperTrap(BlockPos pos, BlockState state) {
+  public TileMobTrap(BlockPos pos, BlockState state) {
     super(CreeperRegistry.TRAP_TILE.get(), pos, state);
   }
 

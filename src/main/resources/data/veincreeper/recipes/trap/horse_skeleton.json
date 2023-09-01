@@ -1,7 +1,7 @@
 {
 	"type": "veincreeper:trap",
 	"input": {
-		"item": "minecraft:bone"
+		"tag": "forge:bones"
 	},
 	"trappedEntity": {
 		"entity": "minecraft:horse",

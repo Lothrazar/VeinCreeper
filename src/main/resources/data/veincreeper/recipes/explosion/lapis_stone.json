@@ -5,7 +5,7 @@
 		"tag": "minecraft:stone_ore_replaceables"
 	},
 	"ore": {
-		"block": "minecraft:deepslate_lapis_ore"
+		"block": "minecraft:lapis_ore"
 	},
 	"conditions": [
 		{

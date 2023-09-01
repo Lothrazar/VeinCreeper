@@ -4,7 +4,8 @@
 		"tag": "forge:ingots/copper"
 	},
 	"trappedEntity": {
-		"entity": "minecraft:creeper"
+		"entity": "minecraft:creeper",
+		"nbt":{"OnGround":1} 
 	},
 	"result": {
 		"entity": "veincreeper:copper_creeper"

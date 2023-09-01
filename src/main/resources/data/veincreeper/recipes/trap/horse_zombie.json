@@ -1,7 +1,7 @@
 {
 	"type": "veincreeper:trap",
 	"input": {
-		"tag": "forge:nuggets/gold"
+		"item": "minecraft:rotten_flesh"
 	},
 	"trappedEntity": {
 		"entity": "minecraft:horse",

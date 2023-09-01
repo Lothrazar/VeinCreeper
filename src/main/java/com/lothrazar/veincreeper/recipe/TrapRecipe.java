@@ -17,6 +17,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.animal.Rabbit;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -30,8 +31,8 @@ public class TrapRecipe implements Recipe<Container> {
 
   private final ResourceLocation id;
   private final Ingredient input;
-  private final EntityIngredient inputEntity;
-  private final EntityIngredient outputEntity;
+  public final EntityIngredient inputEntity;
+  public final EntityIngredient outputEntity;
 
   public TrapRecipe(ResourceLocation id, Ingredient ing, ResourceLocation entityType, ResourceLocation entityOut, CompoundTag tag, CompoundTag tago) {
     super();
@@ -68,7 +69,7 @@ public class TrapRecipe implements Recipe<Container> {
 
   @Override
   public RecipeType<?> getType() {
-    return CreeperRegistry.RECIPE_TRAP.get();
+    return CreeperRegistry.TRAP_RECIPE.get();
   }
 
   @Override
@@ -78,7 +79,7 @@ public class TrapRecipe implements Recipe<Container> {
 
   @Override
   public String toString() {
-    return "TrapRecipe [id=" + id + ", input=" + input + ", inputEntity=" + inputEntity + ", outputEntity=" + outputEntity + "]";
+    return "TrapRecipe [id=" + id + ", input=" + getInput() + ", inputEntity=" + inputEntity + ", outputEntity=" + outputEntity + "]";
   }
 
   public static class SerializeTrapRecipe implements RecipeSerializer<TrapRecipe> {
@@ -150,7 +151,7 @@ public class TrapRecipe implements Recipe<Container> {
 
     @Override
     public void toNetwork(FriendlyByteBuf buffer, TrapRecipe recipe) {
-      recipe.input.toNetwork(buffer);
+      recipe.getInput().toNetwork(buffer);
       buffer.writeResourceLocation(recipe.inputEntity.getEntityId());
       buffer.writeNbt(recipe.inputEntity.getNbt());
       buffer.writeResourceLocation(recipe.outputEntity.getEntityId());
@@ -160,7 +161,7 @@ public class TrapRecipe implements Recipe<Container> {
 
   public boolean matches(Level level, ItemStack dyeFound, Entity entity) {
     var trapped = ForgeRegistries.ENTITY_TYPES.getValue(inputEntity.getEntityId());
-    boolean matches = (trapped == entity.getType() && this.input.test(dyeFound));
+    boolean matches = (trapped == entity.getType() && this.getInput().test(dyeFound));
     if (matches && !this.inputEntity.getNbt().isEmpty()) {
       boolean tagMatch = false;
       CompoundTag entityData = new CompoundTag(); // bullshit what it isentity.getPersistentData();
@@ -168,7 +169,6 @@ public class TrapRecipe implements Recipe<Container> {
       var inputTags = this.inputEntity.getNbt();
       for (String key : inputTags.getAllKeys()) {
         if (inputTags.getTagType(key) == Tag.TAG_INT) {
-          VeinCreeperMod.LOGGER.info(key + "COMPARE input int  = " + inputTags.getInt(key) + " VS " + entityData.getInt(key));
           tagMatch = (inputTags.getInt(key) == entityData.getInt(key));
           matches = matches && tagMatch;
           if (!tagMatch) {
@@ -210,20 +210,18 @@ public class TrapRecipe implements Recipe<Container> {
     if (entityFromRecipe == null) {
       VeinCreeperMod.LOGGER.error("Recipe spawn failed, entity not registered " + entityFromRecipe);
     }
-    //
-    Entity entity;
+    // 
     if (this.inputEntity.getEntityId().equals(this.outputEntity.getEntityId())) {
       VeinCreeperMod.LOGGER.info("haha haxor keep same entity dont make a new one duh");
-      entity = entityToKill;// just edit the fucker
     }
     else {
       //ok normal flow
-      VeinCreeperMod.LOGGER.info("spawn New entity from type  " + entityFromRecipe);
-      entity = entityFromRecipe.spawn(level, pos, MobSpawnType.CONVERSION);
-      if (entity instanceof Player == false) {
+      if (entityToKill instanceof Player == false) {
         VeinCreeperMod.LOGGER.info("kill and remove enitty" + entityToKill);
         entityToKill.remove(RemovalReason.KILLED);
       }
+      VeinCreeperMod.LOGGER.info("spawn New entity from type  " + entityFromRecipe);
+      entityToKill = entityFromRecipe.spawn(level, pos, MobSpawnType.CONVERSION);
     }
     VeinCreeperMod.LOGGER.info("spawnEntityResult " + this.outputEntity);
     var inputTags = this.inputEntity.getNbt();
@@ -231,26 +229,35 @@ public class TrapRecipe implements Recipe<Container> {
     if (!outputTags.isEmpty()) {
       //extract data. edit and push it back in
       CompoundTag entityData = new CompoundTag(); // bullshit what it isentity.getPersistentData();
-      entity.save(entityData); //save WITH ID?
+      entityToKill.save(entityData); //save WITH ID?
       for (String key : outputTags.getAllKeys()) {
+        Rabbit xyz;
+        VeinCreeperMod.LOGGER.info(" outputTags = " + outputTags);
         if (inputTags.getTagType(key) == Tag.TAG_INT) {
           VeinCreeperMod.LOGGER.info("WRITE int//short spawning " + outputTags.getInt(key));
           entityData.putInt(key, outputTags.getInt(key));
         }
-        if (inputTags.getTagType(key) == Tag.TAG_BYTE) {
+        else if (inputTags.getTagType(key) == Tag.TAG_BYTE) {
           VeinCreeperMod.LOGGER.info("WRITE bool " + outputTags.getBoolean(key));
           entityData.putBoolean(key, outputTags.getBoolean(key));
         }
-        if (inputTags.getTagType(key) == Tag.TAG_STRING) {
+        else if (inputTags.getTagType(key) == Tag.TAG_STRING) {
           VeinCreeperMod.LOGGER.info("WRITE STR " + outputTags.getString(key));
           entityData.putString(key, outputTags.getString(key));
         }
+        else {
+          VeinCreeperMod.LOGGER.info(this.id + "unknown type!!!!!!!!!!!!!!!!!! " + inputTags.getTagType(key));
+        }
       }
       VeinCreeperMod.LOGGER.info("actually load nbt into entityData=" + entityData);
-      entity.load(entityData);
+      entityToKill.load(entityData);
     }
     else {
       VeinCreeperMod.LOGGER.info("output tags empty for recipe " + this.id);
     }
+  }
+
+  public Ingredient getInput() {
+    return input;
   }
 }

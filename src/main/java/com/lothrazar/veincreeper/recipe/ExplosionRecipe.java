@@ -3,6 +3,7 @@ package com.lothrazar.veincreeper.recipe;
 import com.google.gson.JsonObject;
 import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
+import com.lothrazar.veincreeper.conf.CreeperConfigManager;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
@@ -10,12 +11,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ExplosionRecipe implements Recipe<Container> {
@@ -130,7 +133,7 @@ public class ExplosionRecipe implements Recipe<Container> {
       try {
         String target = json.get("target").getAsJsonObject().get("tag").getAsString();
         TagKey<Block> targetMe = TagKey.create(Registries.BLOCK, new ResourceLocation(target));
-        ResourceLocation entity = new ResourceLocation(json.get(VeinCreeperMod.MODID).getAsString());
+        ResourceLocation entity = new ResourceLocation(VeinCreeperMod.MODID, json.get(VeinCreeperMod.MODID).getAsString());
         JsonObject oreJson = json.get("ore").getAsJsonObject();
         String blockId = oreJson.get("block").getAsString();
         Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockId));
@@ -142,7 +145,7 @@ public class ExplosionRecipe implements Recipe<Container> {
           bonus = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(bonusId));
           bonusChance = oreJson.get("bonusChance").getAsFloat();
         }
-        VeinCreeperMod.LOGGER.debug("SUCCESS loading recipe  " + recipeId);
+        VeinCreeperMod.LOGGER.debug("loading explosion recipe  " + recipeId);
         return new ExplosionRecipe(recipeId, entity, targetMe, ore, bonus, bonusChance);
       }
       catch (Exception e) {
@@ -172,5 +175,17 @@ public class ExplosionRecipe implements Recipe<Container> {
       buffer.writeResourceLocation(key);
       buffer.writeResourceLocation(recipe.entityType);
     }
+  }
+
+  public boolean matches(Entity exploder, BlockState blockstate) {
+    final String key = CreeperConfigManager.getKeyFromEntity(exploder);
+    var src = getEntityType().getPath().toString();
+    VeinCreeperMod.LOGGER.info(" ** " + this.id);
+    VeinCreeperMod.LOGGER.info("  " + src + " vs " + key);
+    VeinCreeperMod.LOGGER.info("   " + blockstate + " vs " + getReplace());
+    //namespace is always mod id. at least for this recipe
+    boolean match = src.equals(key) && blockstate.is(getReplace());
+    VeinCreeperMod.LOGGER.info("   match=" + match);
+    return match;
   }
 }

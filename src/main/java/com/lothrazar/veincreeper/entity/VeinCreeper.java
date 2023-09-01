@@ -1,6 +1,6 @@
 package com.lothrazar.veincreeper.entity;
 
-import com.lothrazar.veincreeper.conf.CreepType;
+import com.lothrazar.veincreeper.conf.VeinCreeperType;
 import com.lothrazar.veincreeper.conf.CreeperConfigManager;
 import com.lothrazar.veincreeper.explosion.ExplosionOres;
 import net.minecraft.network.chat.Component;
@@ -14,7 +14,7 @@ import net.minecraft.world.level.Level;
 
 public class VeinCreeper extends Creeper {
 
-  private CreepType creeperType;
+  private VeinCreeperType creeperType;
 
   public VeinCreeper(EntityType<VeinCreeper> t, Level level) {
     super(t, level);

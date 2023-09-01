@@ -33,7 +33,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 
-public class CreeperTrap extends EntityBlockFlib implements SimpleWaterloggedBlock {
+public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBlock {
 
   public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
   public static final DirectionProperty HORIZONTAL_FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -49,14 +49,14 @@ public class CreeperTrap extends EntityBlockFlib implements SimpleWaterloggedBlo
   boolean sneakPlayerAvoid = true;
   private boolean requiresRedstoneSignal = false;
 
-  public CreeperTrap(Properties prop) {
+  public BlockMobTrap(Properties prop) {
     super(prop);
     this.registerDefaultState(this.stateDefinition.any().setValue(WATERLOGGED, false).setValue(HORIZONTAL_FACING, Direction.NORTH).setValue(ATTACH_FACE, AttachFace.WALL));
   }
 
   @Override
   public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-    return new TileCreeperTrap(pos, state);
+    return new TileMobTrap(pos, state);
   }
 
   @Override
@@ -84,18 +84,25 @@ public class CreeperTrap extends EntityBlockFlib implements SimpleWaterloggedBlo
     //else i dont need it. (or i do and i has it))
     BlockEntity blockEntity = level.getBlockEntity(pos);
     if (!level.isClientSide &&
-        blockEntity instanceof TileCreeperTrap) {
+        blockEntity instanceof TileMobTrap) {
       var caps = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
       if (caps == null) {
         return;
       }
       ItemStack dyeFound = caps.getStackInSlot(0);
-      for (TrapRecipe recipe : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.RECIPE_TRAP.get())) {
+      if (dyeFound.isEmpty()) {
+        return;
+      }
+      for (TrapRecipe recipe : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.TRAP_RECIPE.get())) {
         if (recipe.matches(level, dyeFound, entity)) {
           VeinCreeperMod.LOGGER.info(dyeFound + "Found  match " + entity + " vs recipe" + recipe.toString());
           //give result
           recipe.spawnEntityResult((ServerLevel) level, pos, entity); //pay cost 
-          dyeFound.shrink(1);
+          //          dyeFound.shrink(1);
+          caps.extractItem(0, 1, false);
+          if (caps.getStackInSlot(0).isEmpty()) {
+            level.markAndNotifyBlock(pos, level.getChunkAt(pos), state, state, UPDATE_ALL_IMMEDIATE, UPDATE_ALL);
+          }
         }
       }
     }
@@ -165,7 +172,7 @@ public class CreeperTrap extends EntityBlockFlib implements SimpleWaterloggedBlo
   public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
     if (state.getBlock() != newState.getBlock()) {
       BlockEntity tileentity = worldIn.getBlockEntity(pos);
-      if (tileentity instanceof TileCreeperTrap grinder) {
+      if (tileentity instanceof TileMobTrap grinder) {
         var cap = tileentity.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
         for (int i = 0; i < cap.getSlots(); ++i) {
           Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), cap.getStackInSlot(i));

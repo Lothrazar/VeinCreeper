@@ -10,12 +10,14 @@ import com.lothrazar.veincreeper.entity.VeinCreeper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
 public class CreeperConfigManager extends ConfigTemplate {
 
   private static ForgeConfigSpec CONFIG;
   public static ConfigValue<List<? extends String>> ENTITIES;
+  public static BooleanValue SPAWN_EGGS;
   //default entities
   private static final List<String> DFLT = Arrays.asList(new String[] {
       "coal_creeper,40,20,20,150,Coal,false",
@@ -37,6 +39,7 @@ public class CreeperConfigManager extends ConfigTemplate {
     BUILDER.comment("General settings").push(VeinCreeperMod.MODID);
     ENTITIES = BUILDER.comment("IMPORTANT: new creepers added here may not generate ore without adding custom recipes of type 'veincreeper:explosion', add more using datapacks.  Each row here will register one new creeper entity type. (unique_id,red,green,blue,display_name). The 'unique_id' string must exactly match the property used in the explosion recipe, this will link the creeper mob to the ore explosion recipe.  Color values are used as an overlay to existing creeper texture.  Test them out /summon veincreeper:coal_creeper")
         .defineList("creepers", DFLT, s -> s instanceof String);
+    SPAWN_EGGS = BUILDER.comment("Register spawn eggs for testing. They have no textures so you would have to add a resource pack if you need these visible in a modpack.  Without eggs you can still use the trap block, or the /summon command for spawning veincreeper's").define("spawn_eggs", false);
     BUILDER.pop(); // one pop for every push
     CONFIG = BUILDER.build();
   }
@@ -53,10 +56,10 @@ public class CreeperConfigManager extends ConfigTemplate {
       try {
         String id = arr[0];
         int[] color = new int[] { Integer.parseInt(arr[1]), Integer.parseInt(arr[2]), Integer.parseInt(arr[3]), Integer.parseInt(arr[4]) };
-        CreeperRegistry.CREEPERS.put(id, new CreepType(arr[0], color, arr[5], Boolean.parseBoolean(arr[6])));
+        CreeperRegistry.CREEPERS.put(id, new VeinCreeperType(arr[0], color, arr[5], Boolean.parseBoolean(arr[6]))); // TODO: is destructive (does it explode what it doesnt convert)
       }
       catch (Exception e) {
-        VeinCreeperMod.LOGGER.error(" CSV error: ", e);
+        VeinCreeperMod.LOGGER.debug(" CSV debug: ", e);
         //////////////////////////////////////////////////// 0      1    2     3    4      5             6
         VeinCreeperMod.LOGGER.error("Error parsing config (entityId,red,green,blue,alpha,displayName,shouldDropExp)  " + Arrays.toString(arr));
       }
@@ -76,7 +79,7 @@ public class CreeperConfigManager extends ConfigTemplate {
     return key;
   }
 
-  public static CreepType getCreepType(EntityType partyCreeper) {
+  public static VeinCreeperType getCreepType(EntityType partyCreeper) {
     for (var creeper : CreeperRegistry.CREEPERS.values()) {
       if (creeper.getEntityType() == partyCreeper) {
         return creeper;
@@ -85,7 +88,7 @@ public class CreeperConfigManager extends ConfigTemplate {
     return null;
   }
 
-  public static CreepType getCreepType(VeinCreeper partyCreeper) {
+  public static VeinCreeperType getCreepType(VeinCreeper partyCreeper) {
     return getCreepType(partyCreeper.getType());
   }
   //  public static Component getDisplayName(PartyCreeper partyCreeper) {

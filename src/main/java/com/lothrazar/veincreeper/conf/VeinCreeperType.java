@@ -5,7 +5,7 @@ import com.lothrazar.veincreeper.entity.VeinCreeper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 
-public class CreepType {
+public class VeinCreeperType {
 
   private String id;
   private int[] color = new int[4];//render overrides. format is RGBA in range [0,255] render maps this to [0,1]
@@ -14,7 +14,7 @@ public class CreepType {
   private boolean shouldDropExperience;
   public Supplier<EntityType<VeinCreeper>> hack;
 
-  public CreepType(String id, int[] col, String blockName, boolean exp) {
+  public VeinCreeperType(String id, int[] col, String blockName, boolean exp) {
     if (col.length != 4) {
       throw new IllegalArgumentException("Check color-config values and try again for id=" + id);
     }
@@ -62,5 +62,9 @@ public class CreepType {
 
   public boolean shouldDropExperience() {
     return this.shouldDropExperience;
+  }
+
+  public boolean isDestructive() {
+    return false;
   }
 }

@@ -7,7 +7,7 @@
 	"ore": {
 		"block": "minecraft:diamond_ore"
 	},
-	"conditions": [
+	"conditions": [ 
 		{
 			"type": "flib:entity_exists",
 			"value": "veincreeper:diamond_creeper"

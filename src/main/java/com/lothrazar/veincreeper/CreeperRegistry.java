@@ -2,10 +2,10 @@ package com.lothrazar.veincreeper;
 
 import java.util.ArrayList;
 import java.util.Map;
-import com.lothrazar.veincreeper.block.CreeperTrap;
-import com.lothrazar.veincreeper.block.TileCreeperTrap;
-import com.lothrazar.veincreeper.conf.CreepType;
+import com.lothrazar.veincreeper.block.BlockMobTrap;
+import com.lothrazar.veincreeper.block.TileMobTrap;
 import com.lothrazar.veincreeper.conf.CreeperConfigManager;
+import com.lothrazar.veincreeper.conf.VeinCreeperType;
 import com.lothrazar.veincreeper.entity.VeinCreeper;
 import com.lothrazar.veincreeper.entity.VeinCreeperRender;
 import com.lothrazar.veincreeper.recipe.ExplosionRecipe;
@@ -46,37 +46,36 @@ public class CreeperRegistry {
   static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, VeinCreeperMod.MODID);
   static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, VeinCreeperMod.MODID);
   static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, VeinCreeperMod.MODID);
-  public static final RegistryObject<Block> TRAP = BLOCKS.register("trap", () -> new CreeperTrap(Block.Properties.of()));
-  public static final RegistryObject<BlockEntityType<TileCreeperTrap>> TRAP_TILE = TILES.register("trap", () -> BlockEntityType.Builder.of(TileCreeperTrap::new, TRAP.get()).build(null));
+  public static final RegistryObject<Block> TRAP = BLOCKS.register("trap", () -> new BlockMobTrap(Block.Properties.of()));
+  public static final RegistryObject<BlockEntityType<TileMobTrap>> TRAP_TILE = TILES.register("trap", () -> BlockEntityType.Builder.of(TileMobTrap::new, TRAP.get()).build(null));
   public static final RegistryObject<RecipeType<ExplosionRecipe>> EXPLOSION_RECIPE = RECIPE_TYPES.register("explosion", () -> new RecipeType<ExplosionRecipe>() {});
   public static final RegistryObject<SerializePartyRecipe> R_SERIALIZER = RECIPE_SERIALIZERS.register("explosion", SerializePartyRecipe::new);
-  public static final RegistryObject<RecipeType<TrapRecipe>> RECIPE_TRAP = RECIPE_TYPES.register("trap", () -> new RecipeType<TrapRecipe>() {});
+  public static final RegistryObject<RecipeType<TrapRecipe>> TRAP_RECIPE = RECIPE_TYPES.register("trap", () -> new RecipeType<TrapRecipe>() {});
   public static final RegistryObject<SerializeTrapRecipe> TRAP_SERIALIZER = RECIPE_SERIALIZERS.register("trap", SerializeTrapRecipe::new);
   static Builder<VeinCreeper> BUILDER = EntityType.Builder.<VeinCreeper> of(VeinCreeper::new, MobCategory.MISC).sized(1.4F, 2.7F - 0.3F).clientTrackingRange(10);
-  public static Map<String, CreepType> CREEPERS;
-  //  public static Map<String, Supplier<EntityType<VeinCreeper>>> EGG_HACKS = new HashMap<>();
-  static boolean entitiesLoaded = false;
+  public static Map<String, VeinCreeperType> CREEPERS;
   static ArrayList<ForgeSpawnEggItem> EGGIES = new ArrayList<>();
 
   @SubscribeEvent
   public static void onRegistry(RegisterEvent event) {
     event.register(Registries.ENTITY_TYPE, reg -> {
-      for (CreepType type : CREEPERS.values()) {
+      for (VeinCreeperType type : CREEPERS.values()) {
         type.setEntityType(BUILDER.build(type.getId()));
         reg.register(type.getId(), type.getEntityType());
         type.hack = () -> type.getEntityType();
       }
-      entitiesLoaded = true;
     });
     event.register(Registries.ITEM, reg -> {
       reg.register("trap", new BlockItem(TRAP.get(), new Item.Properties()));
       CreeperConfigManager.parseConfig();
-      for (CreepType type : CREEPERS.values()) {
-        type.hack = () -> type.getEntityType();
-        //        public static final Item CREEPER_SPAWN_EGG = registerItem("creeper_spawn_egg", new SpawnEggItem(EntityType.CREEPER, 894731, 0, new Item.Properties()));
-        var egg = new ForgeSpawnEggItem(type.hack, 894731, 0, new Item.Properties());
-        reg.register("spawn_egg_" + type.getId(), egg);
-        EGGIES.add(egg);
+      if (CreeperConfigManager.SPAWN_EGGS.get()) {
+        for (VeinCreeperType type : CREEPERS.values()) {
+          type.hack = () -> type.getEntityType();
+          //        public static final Item CREEPER_SPAWN_EGG = registerItem("creeper_spawn_egg", new SpawnEggItem(EntityType.CREEPER, 894731, 0, new Item.Properties()));
+          var egg = new ForgeSpawnEggItem(type.hack, 894731, 0, new Item.Properties());
+          reg.register("spawn_egg_" + type.getId(), egg);
+          EGGIES.add(egg);
+        }
       }
     });
     event.register(Registries.CREATIVE_MODE_TAB, helper -> {
@@ -84,8 +83,10 @@ public class CreeperRegistry {
           .title(Component.translatable("itemGroup." + VeinCreeperMod.MODID))
           .displayItems((enabledFlags, populator) -> {
             populator.accept(TRAP.get());
-            for (Item egg : EGGIES) {
-              populator.accept(egg);
+            if (CreeperConfigManager.SPAWN_EGGS.get()) {
+              for (Item egg : EGGIES) {
+                populator.accept(egg);
+              }
             }
           }).build());
     });

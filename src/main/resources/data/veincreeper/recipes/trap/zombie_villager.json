@@ -1,0 +1,12 @@
+{
+	"type": "veincreeper:trap",
+	"input": {
+		"item": "minecraft:emerald"
+	},
+	"trappedEntity": {
+		"entity": "minecraft:zombie"
+	},
+	"result": {
+		"entity": "minecraft:zombie_villager"
+	}
+}
