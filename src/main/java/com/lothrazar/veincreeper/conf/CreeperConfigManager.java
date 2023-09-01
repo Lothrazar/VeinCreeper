@@ -39,7 +39,8 @@ public class CreeperConfigManager extends ConfigTemplate {
     BUILDER.comment("General settings").push(VeinCreeperMod.MODID);
     ENTITIES = BUILDER.comment("IMPORTANT: new creepers added here may not generate ore without adding custom recipes of type 'veincreeper:explosion', add more using datapacks.  Each row here will register one new creeper entity type. (unique_id,red,green,blue,display_name). The 'unique_id' string must exactly match the property used in the explosion recipe, this will link the creeper mob to the ore explosion recipe.  Color values are used as an overlay to existing creeper texture.  Test them out /summon veincreeper:coal_creeper")
         .defineList("creepers", DFLT, s -> s instanceof String);
-    SPAWN_EGGS = BUILDER.comment("Register spawn eggs for testing. They have no textures so you would have to add a resource pack if you need these visible in a modpack.  Without eggs you can still use the trap block, or the /summon command for spawning veincreeper's").define("spawn_eggs", false);
+    SPAWN_EGGS = BUILDER.comment("Register spawn eggs for testing. false here will hide remove the eggs.  If you added new mobs to the config you will also need to make a resource pack to setup your new eggs.  Without eggs you can still use the trap block, or the /summon command for spawning veincreeper's")
+        .define("spawn_eggs", false);
     BUILDER.pop(); // one pop for every push
     CONFIG = BUILDER.build();
   }
@@ -91,12 +92,4 @@ public class CreeperConfigManager extends ConfigTemplate {
   public static VeinCreeperType getCreepType(VeinCreeper partyCreeper) {
     return getCreepType(partyCreeper.getType());
   }
-  //  public static Component getDisplayName(PartyCreeper partyCreeper) {
-  //    for (var creeper : PartyCreeperRegistry.CREEPERS.values()) {
-  //      if (creeper.getEntityType() == partyCreeper.getType()) {
-  //        return Component.literal(creeper.getBlockName()).append(" ").append(EntityType.CREEPER.getDescription());
-  //      }
-  //    }
-  //    return null;
-  //  }
 }

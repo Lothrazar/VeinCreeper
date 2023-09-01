@@ -50,10 +50,11 @@ public class ExplosionCatalyst implements IRecipeCategory<ExplosionRecipe> {
   public void draw(ExplosionRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics ms, double mouseX, double mouseY) {
     var font = Minecraft.getInstance().font;
     final int FONT = 0xEEEEEE;
-    ms.drawString(font, recipe.getReplace().toString() + " ", 20, 0, FONT);
-    ms.drawString(font, recipe.getEntityType().toString() + " ", 80, 10, FONT);
+    TagKey<Block> tag = recipe.getReplace();
+    ms.drawString(font, tag.location().toString() + " ", 0, 0, FONT);
+    ms.drawString(font, recipe.getEntityType().toString() + " ", 0, 60, FONT);
     if (recipe.getBonusChance() > 0) {
-      ms.drawString(font, (int) recipe.getBonusChance() + "%", 150, 39, FONT);
+      ms.drawString(font, (int) recipe.getBonusChance() + "%", 140, 38, FONT);
     }
   }
 
@@ -62,9 +63,9 @@ public class ExplosionCatalyst implements IRecipeCategory<ExplosionRecipe> {
     TagKey<Block> tag = recipe.getReplace();
     // 
     //    builder.addSlot(RecipeIngredientRole.INPUT, 4, 19).addIngredients(Ingredient.of(tag));
-    builder.addSlot(RecipeIngredientRole.OUTPUT, 138, 19).addItemStack(new ItemStack(recipe.getOreOutput().asItem()));
+    builder.addSlot(RecipeIngredientRole.OUTPUT, 129, 19).addItemStack(new ItemStack(recipe.getOreOutput().asItem()));
     if (recipe.getBonus() != null) {
-      builder.addSlot(RecipeIngredientRole.OUTPUT, 138, 39).addItemStack(new ItemStack(recipe.getBonus().asItem()));
+      builder.addSlot(RecipeIngredientRole.OUTPUT, 129, 39).addItemStack(new ItemStack(recipe.getBonus().asItem()));
     }
   }
 
