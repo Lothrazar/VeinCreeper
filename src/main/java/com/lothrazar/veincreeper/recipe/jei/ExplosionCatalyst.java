@@ -60,7 +60,7 @@ public class ExplosionCatalyst implements IRecipeCategory<ExplosionRecipe> {
 
   @Override
   public void setRecipe(IRecipeLayoutBuilder builder, ExplosionRecipe recipe, IFocusGroup focuses) {
-    TagKey<Block> tag = recipe.getReplace();
+    // TagKey<Block> tag = recipe.getReplace();
     // 
     //    builder.addSlot(RecipeIngredientRole.INPUT, 4, 19).addIngredients(Ingredient.of(tag));
     builder.addSlot(RecipeIngredientRole.OUTPUT, 129, 19).addItemStack(new ItemStack(recipe.getOreOutput().asItem()));

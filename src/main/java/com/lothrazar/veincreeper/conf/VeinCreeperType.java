@@ -15,13 +15,15 @@ public class VeinCreeperType {
   private boolean shouldDropExperience;
   public Supplier<EntityType<VeinCreeper>> hack;
   private boolean isDestructive;
+  private float radius = 2.1F;
 
-  public VeinCreeperType(String id, Color col, String blockName, boolean exp, boolean isDestructive) {
+  public VeinCreeperType(String id, Color col, String blockName, boolean exp, boolean isDestructive, float radius) {
     this.setId(id);
     this.setColor(col);
     this.setBlockName(blockName);
     this.shouldDropExperience = exp;
     this.isDestructive = isDestructive;
+    this.setRadius(radius);
   }
 
   public EntityType<VeinCreeper> getEntityType() {
@@ -66,5 +68,16 @@ public class VeinCreeperType {
 
   public boolean isDestructive() {
     return isDestructive;
+  }
+
+  public float getRadius() {
+    return this.radius;
+  }
+
+  public void setRadius(float f) {
+    if (f < 0.5) {
+      f = 0.5F;
+    }
+    this.radius = f;
   }
 }

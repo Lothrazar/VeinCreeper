@@ -17,7 +17,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.animal.Rabbit;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -231,7 +230,6 @@ public class TrapRecipe implements Recipe<Container> {
       CompoundTag entityData = new CompoundTag(); // bullshit what it isentity.getPersistentData();
       entityToKill.save(entityData); //save WITH ID?
       for (String key : outputTags.getAllKeys()) {
-        Rabbit xyz;
         VeinCreeperMod.LOGGER.info(" outputTags = " + outputTags);
         if (inputTags.getTagType(key) == Tag.TAG_INT) {
           VeinCreeperMod.LOGGER.info("WRITE int//short spawning " + outputTags.getInt(key));

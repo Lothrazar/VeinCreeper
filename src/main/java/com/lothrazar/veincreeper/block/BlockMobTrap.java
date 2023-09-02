@@ -168,6 +168,7 @@ public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBl
     builder.add(HORIZONTAL_FACING).add(ATTACH_FACE).add(WATERLOGGED);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
     if (state.getBlock() != newState.getBlock()) {

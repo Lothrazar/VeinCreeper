@@ -1,7 +1,7 @@
 package com.lothrazar.veincreeper.entity;
 
-import com.lothrazar.veincreeper.conf.VeinCreeperType;
 import com.lothrazar.veincreeper.conf.CreeperConfigManager;
+import com.lothrazar.veincreeper.conf.VeinCreeperType;
 import com.lothrazar.veincreeper.explosion.ExplosionOres;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
@@ -11,6 +11,7 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.event.ForgeEventFactory;
 
 public class VeinCreeper extends Creeper {
 
@@ -34,14 +35,14 @@ public class VeinCreeper extends Creeper {
   @Override
   public void explodeCreeper() {
     if (!this.level().isClientSide) {
-      float radius = 2.8F; //this.isPowered() ? 2.0F : 1.0F + 1; //TODO config? hardcoded large size
+      float radius = creeperType.getRadius();
       this.dead = true;
       var interactionVal = this.level().getGameRules().getBoolean(GameRules.RULE_MOB_EXPLOSION_DROP_DECAY) ? Explosion.BlockInteraction.DESTROY_WITH_DECAY : Explosion.BlockInteraction.DESTROY;
       boolean fire = false;
       //start of level.explode
       ExplosionOres explosion = new ExplosionOres(this.level(), this, (DamageSource) null, (ExplosionDamageCalculator) null, this.getX(), this.getY(), this.getZ(), radius, fire,
           interactionVal);
-      if (!net.minecraftforge.event.ForgeEventFactory.onExplosionStart(this.level(), explosion)) { // returns true if cancelled
+      if (!ForgeEventFactory.onExplosionStart(this.level(), explosion)) { // returns true if cancelled
         explosion.explode();
         explosion.finalizeExplosion(true);
       }
