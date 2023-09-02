@@ -1,9 +1,7 @@
 package com.lothrazar.veincreeper.entity;
 
 import com.lothrazar.veincreeper.conf.CreeperConfigManager;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.CreeperRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
@@ -20,16 +18,13 @@ public class VeinCreeperRender extends CreeperRenderer {
 
   @Override
   public ResourceLocation getTextureLocation(Creeper entity) {
-    if (((VeinCreeperModel) this.model).color == null
+    var cm = (VeinCreeperModel) this.model;
+    if (cm.getColor() == null
         || doRefresh) {
       final String key = CreeperConfigManager.getKeyFromEntity(entity);
-      ((VeinCreeperModel) this.model).color = CreeperConfigManager.getCreeperColor(key);
+      var col = CreeperConfigManager.getCreeperColor(key);
+      cm.setColor(new int[] { col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha() });
     }
     return super.getTextureLocation(entity);
-  }
-
-  @Override
-  public void render(Creeper cree, float p_115456_, float p_115457_, PoseStack ps, MultiBufferSource buff, int light) {
-    super.render(cree, p_115456_, p_115457_, ps, buff, light);
   }
 }

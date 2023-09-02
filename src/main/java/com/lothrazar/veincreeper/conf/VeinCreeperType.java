@@ -1,5 +1,6 @@
 package com.lothrazar.veincreeper.conf;
 
+import java.awt.Color;
 import java.util.function.Supplier;
 import com.lothrazar.veincreeper.entity.VeinCreeper;
 import net.minecraft.network.chat.Component;
@@ -8,20 +9,19 @@ import net.minecraft.world.entity.EntityType;
 public class VeinCreeperType {
 
   private String id;
-  private int[] color = new int[4];//render overrides. format is RGBA in range [0,255] render maps this to [0,1]
+  private Color color;
   private EntityType<VeinCreeper> entityType; //hold just for registries
   private String blockName;//for display name only
   private boolean shouldDropExperience;
   public Supplier<EntityType<VeinCreeper>> hack;
+  private boolean isDestructive;
 
-  public VeinCreeperType(String id, int[] col, String blockName, boolean exp) {
-    if (col.length != 4) {
-      throw new IllegalArgumentException("Check color-config values and try again for id=" + id);
-    }
+  public VeinCreeperType(String id, Color col, String blockName, boolean exp, boolean isDestructive) {
     this.setId(id);
     this.setColor(col);
     this.setBlockName(blockName);
     this.shouldDropExperience = exp;
+    this.isDestructive = isDestructive;
   }
 
   public EntityType<VeinCreeper> getEntityType() {
@@ -40,11 +40,11 @@ public class VeinCreeperType {
     this.id = id;
   }
 
-  public int[] getColor() {
+  public Color getColor() {
     return color;
   }
 
-  public void setColor(int[] color) {
+  public void setColor(Color color) {
     this.color = color;
   }
 
@@ -65,6 +65,6 @@ public class VeinCreeperType {
   }
 
   public boolean isDestructive() {
-    return false;
+    return isDestructive;
   }
 }

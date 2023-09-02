@@ -1,1 +1,5 @@
-{ }
+{
+	"itemGroup.veincreeper":"Vein Creeper Mod",
+	"block.veincreeper.trap":"Infusion Mob Trap",
+	"block.veincreeper.trap.tooltip":"Change and Transform mobs using item based recipes"
+}

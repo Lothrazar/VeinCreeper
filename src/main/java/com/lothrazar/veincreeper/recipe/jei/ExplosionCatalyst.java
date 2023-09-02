@@ -54,7 +54,7 @@ public class ExplosionCatalyst implements IRecipeCategory<ExplosionRecipe> {
     ms.drawString(font, tag.location().toString() + " ", 0, 0, FONT);
     ms.drawString(font, recipe.getEntityType().toString() + " ", 0, 60, FONT);
     if (recipe.getBonusChance() > 0) {
-      ms.drawString(font, (int) recipe.getBonusChance() + "%", 140, 38, FONT);
+      ms.drawString(font, (int) recipe.getBonusChance() + "%", 148, 46, FONT);
     }
   }
 

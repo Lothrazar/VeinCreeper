@@ -2,7 +2,6 @@ package com.lothrazar.veincreeper;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.lothrazar.veincreeper.conf.CreeperCmd;
 import com.lothrazar.veincreeper.conf.CreeperConfigManager;
 import com.lothrazar.veincreeper.event.TrapCreeperEvents;
 import net.minecraftforge.common.MinecraftForge;
@@ -24,6 +23,5 @@ public class VeinCreeperMod {
     CreeperRegistry.BLOCKS.register(bus);
     CreeperRegistry.TILES.register(bus);
     MinecraftForge.EVENT_BUS.register(new TrapCreeperEvents());
-    MinecraftForge.EVENT_BUS.register(new CreeperCmd());
   }
 }

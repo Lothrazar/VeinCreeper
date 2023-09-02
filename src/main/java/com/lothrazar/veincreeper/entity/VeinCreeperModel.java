@@ -8,7 +8,7 @@ import net.minecraft.world.entity.Entity;
 
 public class VeinCreeperModel<T extends Entity> extends CreeperModel<T> {
 
-  int[] color = null;
+  private int[] color = null;
 
   public VeinCreeperModel(ModelPart mp) {
     super(mp);
@@ -17,14 +17,22 @@ public class VeinCreeperModel<T extends Entity> extends CreeperModel<T> {
   @Override
   public void renderToBuffer(PoseStack ps, VertexConsumer vc, int l, int overlay, float r, float g, float b, float a) {
     //overlay is used when explosion is happening 
-    if (color != null && color.length == 3) {
-      super.renderToBuffer(ps, vc, l, overlay, color[0] / 255F, color[1] / 255F, color[2] / 255F, a);
+    if (getColor() != null && getColor().length == 3) {
+      super.renderToBuffer(ps, vc, l, overlay, getColor()[0] / 255F, getColor()[1] / 255F, getColor()[2] / 255F, a);
     }
-    else if (color != null && color.length == 4) {
-      super.renderToBuffer(ps, vc, l, overlay, color[0] / 255F, color[1] / 255F, color[2] / 255F, color[3] / 255F);
+    else if (getColor() != null && getColor().length == 4) {
+      super.renderToBuffer(ps, vc, l, overlay, getColor()[0] / 255F, getColor()[1] / 255F, getColor()[2] / 255F, getColor()[3] / 255F);
     }
     else {
       super.renderToBuffer(ps, vc, l, overlay, r, g, b, a);
     }
+  }
+
+  public int[] getColor() {
+    return color;
+  }
+
+  public void setColor(int[] color) {
+    this.color = color;
   }
 }

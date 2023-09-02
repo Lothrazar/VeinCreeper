@@ -54,7 +54,7 @@ public class CreeperRegistry {
   public static final RegistryObject<SerializeTrapRecipe> TRAP_SERIALIZER = RECIPE_SERIALIZERS.register("trap", SerializeTrapRecipe::new);
   static Builder<VeinCreeper> BUILDER = EntityType.Builder.<VeinCreeper> of(VeinCreeper::new, MobCategory.MISC).sized(1.4F, 2.7F - 0.3F).clientTrackingRange(10);
   public static Map<String, VeinCreeperType> CREEPERS;
-  static ArrayList<ForgeSpawnEggItem> EGGIES = new ArrayList<>();
+  private static final ArrayList<ForgeSpawnEggItem> EGGIES = new ArrayList<>();
 
   @SubscribeEvent
   public static void onRegistry(RegisterEvent event) {
@@ -62,7 +62,6 @@ public class CreeperRegistry {
       for (VeinCreeperType type : CREEPERS.values()) {
         type.setEntityType(BUILDER.build(type.getId()));
         reg.register(type.getId(), type.getEntityType());
-        type.hack = () -> type.getEntityType();
       }
     });
     event.register(Registries.ITEM, reg -> {
@@ -70,9 +69,16 @@ public class CreeperRegistry {
       CreeperConfigManager.parseConfig();
       if (CreeperConfigManager.SPAWN_EGGS.get()) {
         for (VeinCreeperType type : CREEPERS.values()) {
-          type.hack = () -> type.getEntityType();
-          //        public static final Item CREEPER_SPAWN_EGG = registerItem("creeper_spawn_egg", new SpawnEggItem(EntityType.CREEPER, 894731, 0, new Item.Properties()));
-          var egg = new ForgeSpawnEggItem(type.hack, 894731, 0, new Item.Properties());
+          var egg = new ForgeSpawnEggItem(
+              () -> type.getEntityType(),
+              type.getColor().getRGB(), 0,
+              new Item.Properties()) {
+
+            @Override
+            public Component getName(ItemStack s) {
+              return type.getDisplayName();
+            }
+          };
           reg.register("spawn_egg_" + type.getId(), egg);
           EGGIES.add(egg);
         }
