@@ -50,7 +50,7 @@ public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBl
   private boolean requiresRedstoneSignal = false;
 
   public BlockMobTrap(Properties prop) {
-    super(prop);
+    super(prop.strength(10, 1200));
     this.registerDefaultState(this.stateDefinition.any().setValue(WATERLOGGED, false).setValue(HORIZONTAL_FACING, Direction.NORTH).setValue(ATTACH_FACE, AttachFace.WALL));
   }
 

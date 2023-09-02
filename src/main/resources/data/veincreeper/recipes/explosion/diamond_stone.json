@@ -5,7 +5,9 @@
 		"tag": "minecraft:stone_ore_replaceables"
 	},
 	"ore": {
-		"block": "minecraft:diamond_ore"
+		"block": "minecraft:diamond_ore",
+		"bonus": "minecraft:diamond_block",
+		"bonusChance": 2.0
 	},
 	"conditions": [ 
 		{

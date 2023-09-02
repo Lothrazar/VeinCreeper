@@ -5,7 +5,9 @@
 		"tag": "minecraft:stone_ore_replaceables"
 	},
 	"ore": {
-		"block": "minecraft:lapis_ore"
+		"block": "minecraft:lapis_ore",
+		"bonus": "minecraft:lapis_block",
+		"bonusChance": 15.0
 	},
 	"conditions": [
 		{

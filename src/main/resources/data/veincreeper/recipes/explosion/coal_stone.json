@@ -7,7 +7,7 @@
 	"ore": {
 		"block": "minecraft:coal_ore",
 		"bonus": "minecraft:coal_block",
-		"bonusChance": 15.0
+		"bonusChance": 5.0
 	},
 	"conditions": [
 		{

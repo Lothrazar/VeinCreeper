@@ -5,7 +5,9 @@
 		"tag": "minecraft:stone_ore_replaceables"
 	},
 	"ore": {
-		"block": "minecraft:copper_ore"
+		"block": "minecraft:copper_ore",
+		"bonus": "minecraft:copper_block",
+		"bonusChance": 1.0
 	},
 	"conditions": [
 		{

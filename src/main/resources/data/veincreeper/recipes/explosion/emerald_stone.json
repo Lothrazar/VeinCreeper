@@ -5,7 +5,9 @@
 		"tag": "minecraft:stone_ore_replaceables"
 	},
 	"ore": {
-		"block": "minecraft:emerald_ore"
+		"block": "minecraft:emerald_ore",
+		"bonus": "minecraft:emerald_block",
+		"bonusChance": 1.0
 	},
 	"conditions": [
 		{

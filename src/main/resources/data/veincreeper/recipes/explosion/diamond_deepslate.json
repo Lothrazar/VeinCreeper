@@ -7,7 +7,7 @@
 	"ore": {
 		"block": "minecraft:deepslate_diamond_ore",
 		"bonus": "minecraft:diamond_block",
-		"bonusChance": 15.0
+		"bonusChance": 5.0
 	},
 	"conditions": [
 		{

@@ -5,7 +5,9 @@
 		"tag": "forge:netherrack"
 	},
 	"ore": {
-		"block": "minecraft:nether_quartz_ore"
+		"block": "minecraft:nether_quartz_ore",
+		"bonus": "minecraft:quartz_block",
+		"bonusChance": 25.0
 	},
 	"conditions": [
 		{

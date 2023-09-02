@@ -35,10 +35,10 @@ public class VeinCreeper extends Creeper {
   @Override
   public void explodeCreeper() {
     if (!this.level().isClientSide) {
-      float radius = creeperType.getRadius();
+      final float radius = creeperType.getRadius();
+      final boolean fire = creeperType.doesFire();
       this.dead = true;
       var interactionVal = this.level().getGameRules().getBoolean(GameRules.RULE_MOB_EXPLOSION_DROP_DECAY) ? Explosion.BlockInteraction.DESTROY_WITH_DECAY : Explosion.BlockInteraction.DESTROY;
-      boolean fire = false;
       //start of level.explode
       ExplosionOres explosion = new ExplosionOres(this.level(), this, (DamageSource) null, (ExplosionDamageCalculator) null, this.getX(), this.getY(), this.getZ(), radius, fire,
           interactionVal);
