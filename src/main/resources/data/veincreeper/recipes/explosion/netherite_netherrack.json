@@ -1,0 +1,18 @@
+{
+	"type": "veincreeper:explosion",
+	"veincreeper": "netherite_creeper",
+	"target": {
+		"tag": "forge:netherrack"
+	},
+	"ore": {
+		"block": "minecraft:ancient_debris",
+		"bonus": "minecraft:lava",
+		"bonusChance": 40.0
+	},
+	"conditions": [
+		{
+			"type": "flib:entity_exists",
+			"value": "veincreeper:netherite_creeper"
+		}
+	]
+}

@@ -3,7 +3,7 @@
 	"input": {
 		"item": "minecraft:kelp"
 	},
-	"trappedEntity": {
+	"mob": {
 		"entity": "minecraft:zombie"
 	},
 	"result": {

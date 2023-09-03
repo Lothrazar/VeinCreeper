@@ -3,7 +3,7 @@
 	"input": {
 		"tag": "forge:dyes/pink"
 	},
-	"trappedEntity": {
+	"mob": {
 		"entity": "minecraft:axolotl",
 		"nbt":{"Variant":4} 
 	},

@@ -3,7 +3,7 @@
 	"input": {
 		"tag": "forge:dyes/purple"
 	},
-	"trappedEntity": {
+	"mob": {
 		"entity": "minecraft:creeper",
 		"nbt":{"OnGround":1} 
 	},

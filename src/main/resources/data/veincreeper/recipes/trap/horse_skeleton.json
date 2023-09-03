@@ -3,7 +3,7 @@
 	"input": {
 		"tag": "forge:bones"
 	},
-	"trappedEntity": {
+	"mob": {
 		"entity": "minecraft:horse",
 		"nbt": {"Tame": false}
 	},

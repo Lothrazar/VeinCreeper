@@ -30,7 +30,10 @@ public class CreeperConfigManager extends ConfigTemplate {
       "lapis_creeper,#0000FF,Lapis,true,false,2.5,false",
       "emerald_creeper,#00FF00,Emerald,false,false,2.6,false",
       "quartz_creeper,#C7C5C5,Quartz,true,true,2.5,false",
-      "purple_creeper,#FF00FF,Purple,true,false,3.0,false" });
+      "purple_creeper,#FF00FF,Purple,true,false,3.0,false",
+      "stone_creeper,#696969,Stone,true,false,1.9,false",
+      "netherite_creeper,#2F4F4F,Netherite,true,true,2.9,true"
+  });
   static {
     initConfig();
   }

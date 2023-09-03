@@ -3,7 +3,7 @@
 	"input": {
 		"tag": "minecraft:dampens_vibrations"
 	},
-	"trappedEntity": {
+	"mob": {
 		"entity": "minecraft:creeper",
 		"nbt":{"ignited": true} 
 	},

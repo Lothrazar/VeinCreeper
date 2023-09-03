@@ -1,0 +1,19 @@
+{
+	"type": "veincreeper:explosion",
+	"_comment":"veincreepers array. targets array. ore singular. bonus array",
+	"veincreeper": "stone_creeper",
+	"target": {
+		"tag": "minecraft:dirt"
+	},
+	"ore": {
+		"block": "minecraft:stone",
+		"bonus": "minecraft:cobblestone",
+		"bonusChance": 5.0
+	},
+	"conditions": [
+		{
+			"type": "flib:entity_exists",
+			"value": "veincreeper:stone_creeper"
+		}
+	]
+}

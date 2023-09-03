@@ -3,7 +3,7 @@
 	"input": {
 		"item": "minecraft:sand"
 	},
-	"trappedEntity": {
+	"mob": {
 		"entity": "minecraft:zombie"
 	},
 	"result": {

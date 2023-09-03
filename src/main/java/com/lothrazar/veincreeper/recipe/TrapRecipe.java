@@ -93,12 +93,12 @@ public class TrapRecipe implements Recipe<Container> {
     public TrapRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
       try {
         Ingredient itemOnGround = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "input"));
-        String trappedEntity = json.get("trappedEntity").getAsJsonObject().get("entity").getAsString();
+        String trappedEntity = json.get("mob").getAsJsonObject().get("entity").getAsString();
         String transformedEntity = json.get("result").getAsJsonObject().get("entity").getAsString();
         VeinCreeperMod.LOGGER.debug(" loading trap recipe  " + recipeId);
         CompoundTag inputTags = new CompoundTag();
-        if (json.get("trappedEntity").getAsJsonObject().has("nbt")) {
-          var jsonMatch = json.get("trappedEntity").getAsJsonObject().get("nbt").getAsJsonObject();
+        if (json.get("mob").getAsJsonObject().has("nbt")) {
+          var jsonMatch = json.get("mob").getAsJsonObject().get("nbt").getAsJsonObject();
           this.mapJsonOntoTag(jsonMatch, inputTags);
         }
         CompoundTag outputTags = new CompoundTag();

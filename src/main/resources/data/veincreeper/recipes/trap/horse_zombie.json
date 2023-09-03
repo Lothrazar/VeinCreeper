@@ -3,7 +3,7 @@
 	"input": {
 		"item": "minecraft:rotten_flesh"
 	},
-	"trappedEntity": {
+	"mob": {
 		"entity": "minecraft:horse",
 		"nbt": {"Tame": false}
 	},

@@ -24,25 +24,30 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class ExplosionRecipe implements Recipe<Container> {
 
   private final ResourceLocation id;
-  private TagKey<Block> replace = BlockTags.STONE_ORE_REPLACEABLES;
-  private Block oreOutput = null; // Blocks.COAL_ORE;
-  private ResourceLocation entityType;
-  private Block bonus = null;
-  private float bonusChance = 0;
+  //  "_comment":"veincreepers array. targets array. ore singular. bonus array",
+  private TagKey<Block> replace = BlockTags.STONE_ORE_REPLACEABLES;//list of TagIngredient
+  private BlockIngredient oreOutput = null; // list of BlockIngredient
+  private EntityIngredient entityType;// list
+  private BlockIngredient bonus = null;// BonusBlockIngredient
 
-  public ExplosionRecipe(ResourceLocation id, ResourceLocation entityType, TagKey<Block> blockReplace, Block result,
-      Block bonus, float chance) {
+  public ExplosionRecipe(ResourceLocation id, ResourceLocation entityType,
+      TagKey<Block> blockReplace,
+      Block result,
+      Block bonus, Integer chance) {
     super();
     this.id = id;
     this.replace = blockReplace;
-    this.oreOutput = result;
-    this.entityType = entityType;
-    this.bonus = bonus;
-    this.bonusChance = chance;
+    this.oreOutput = new BlockIngredient(result);
+    this.entityType = new EntityIngredient(entityType);
+    this.bonus = new BlockIngredient(bonus, chance);
   }
 
   public ExplosionRecipe(ResourceLocation id, ResourceLocation entityType, TagKey<Block> input, Block result) {
-    this(id, entityType, input, result, null, 0);
+    this(id, entityType, input, result, null, null);
+  }
+
+  public BlockIngredient getOre() {
+    return oreOutput;
   }
 
   @Override
@@ -62,7 +67,11 @@ public class ExplosionRecipe implements Recipe<Container> {
 
   @Override
   public ItemStack getResultItem(RegistryAccess level) {
-    return new ItemStack(oreOutput);
+    return getResultItem();
+  }
+
+  public ItemStack getResultItem() {
+    return new ItemStack(oreOutput.getBlock());
   }
 
   @Override
@@ -80,44 +89,12 @@ public class ExplosionRecipe implements Recipe<Container> {
     return CreeperRegistry.R_SERIALIZER.get();
   }
 
-  public Block getOreOutput() {
-    return oreOutput;
-  }
-
-  public void setOreOutput(Block oreOutput) {
-    this.oreOutput = oreOutput;
-  }
-
-  public ResourceLocation getEntityType() {
-    return entityType;
-  }
-
-  public void setEntityType(ResourceLocation entityType) {
-    this.entityType = entityType;
-  }
-
   public TagKey<Block> getReplace() {
     return replace;
   }
 
-  public void setReplace(TagKey<Block> replace) {
-    this.replace = replace;
-  }
-
-  public Block getBonus() {
+  public BlockIngredient getBonus() {
     return bonus;
-  }
-
-  public void setBonus(Block bonus) {
-    this.bonus = bonus;
-  }
-
-  public float getBonusChance() {
-    return bonusChance;
-  }
-
-  public void setBonusChance(float bonusChance) {
-    this.bonusChance = bonusChance;
   }
 
   public static class SerializePartyRecipe implements RecipeSerializer<ExplosionRecipe> {
@@ -133,20 +110,25 @@ public class ExplosionRecipe implements Recipe<Container> {
       try {
         String target = json.get("target").getAsJsonObject().get("tag").getAsString();
         TagKey<Block> targetMe = TagKey.create(Registries.BLOCK, new ResourceLocation(target));
-        ResourceLocation entity = new ResourceLocation(VeinCreeperMod.MODID, json.get(VeinCreeperMod.MODID).getAsString());
+        String creeperId = json.get(VeinCreeperMod.MODID).getAsString();
+        ResourceLocation entity = new ResourceLocation(VeinCreeperMod.MODID, creeperId);
         JsonObject oreJson = json.get("ore").getAsJsonObject();
         String blockId = oreJson.get("block").getAsString();
         Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockId));
         Block bonus = null;
-        float bonusChance = 0;
+        int bonusChance = 0;
+        VeinCreeperMod.LOGGER.debug("loading explosion recipe  " + recipeId);
         if (oreJson.has("bonus") && oreJson.has("bonusChance")) {
           // optional bonus
           String bonusId = oreJson.get("bonus").getAsString();
           bonus = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(bonusId));
-          bonusChance = oreJson.get("bonusChance").getAsFloat();
+          bonusChance = oreJson.get("bonusChance").getAsInt();
+          //
+          return new ExplosionRecipe(recipeId, entity, targetMe, ore, bonus, bonusChance);
         }
-        VeinCreeperMod.LOGGER.debug("loading explosion recipe  " + recipeId);
-        return new ExplosionRecipe(recipeId, entity, targetMe, ore, bonus, bonusChance);
+        else {
+          return new ExplosionRecipe(recipeId, entity, targetMe, ore);
+        }
       }
       catch (Exception e) {
         VeinCreeperMod.LOGGER.error("Error loading recipe  " + recipeId, e);
@@ -171,21 +153,29 @@ public class ExplosionRecipe implements Recipe<Container> {
     public void toNetwork(FriendlyByteBuf buffer, ExplosionRecipe recipe) {
       // replace, block, entity 
       buffer.writeResourceLocation(recipe.replace.location());
-      var key = ForgeRegistries.BLOCKS.getKey(recipe.oreOutput);
+      var key = ForgeRegistries.BLOCKS.getKey(recipe.oreOutput.getBlock());
       buffer.writeResourceLocation(key);
-      buffer.writeResourceLocation(recipe.entityType);
+      buffer.writeResourceLocation(recipe.entityType.getEntityId());
     }
   }
 
   public boolean matches(Entity exploder, BlockState blockstate) {
     final String key = CreeperConfigManager.getKeyFromEntity(exploder);
-    var src = getEntityType().getPath().toString();
+    var src = entityType.getEntityId().getPath().toString();
     VeinCreeperMod.LOGGER.info(" ** " + this.id);
     VeinCreeperMod.LOGGER.info("  " + src + " vs " + key);
-    VeinCreeperMod.LOGGER.info("   " + blockstate + " vs " + getReplace());
+    VeinCreeperMod.LOGGER.info("   " + blockstate + " vs " + replace);
     //namespace is always mod id. at least for this recipe
-    boolean match = src.equals(key) && blockstate.is(getReplace());
+    boolean match = src.equals(key) && blockstate.is(replace);
     VeinCreeperMod.LOGGER.info("   match=" + match);
     return match;
+  }
+
+  public ResourceLocation getEntityType() {
+    return this.entityType.getEntityId();
+  }
+
+  public boolean hasBonus() {
+    return this.getBonus() != null && this.getBonus().getBlock() != null && this.getBonus().getChance() > 0;
   }
 }

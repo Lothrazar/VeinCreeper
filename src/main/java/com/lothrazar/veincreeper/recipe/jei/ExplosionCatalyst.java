@@ -53,8 +53,8 @@ public class ExplosionCatalyst implements IRecipeCategory<ExplosionRecipe> {
     TagKey<Block> tag = recipe.getReplace();
     ms.drawString(font, tag.location().toString() + " ", 0, 0, FONT);
     ms.drawString(font, recipe.getEntityType().toString() + " ", 0, 60, FONT);
-    if (recipe.getBonusChance() > 0) {
-      ms.drawString(font, (int) recipe.getBonusChance() + "%", 148, 46, FONT);
+    if (recipe.hasBonus()) {
+      ms.drawString(font, recipe.getBonus().getChance() + "%", 148, 46, FONT);
     }
   }
 
@@ -63,9 +63,9 @@ public class ExplosionCatalyst implements IRecipeCategory<ExplosionRecipe> {
     // TagKey<Block> tag = recipe.getReplace();
     // 
     //    builder.addSlot(RecipeIngredientRole.INPUT, 4, 19).addIngredients(Ingredient.of(tag));
-    builder.addSlot(RecipeIngredientRole.OUTPUT, 129, 19).addItemStack(new ItemStack(recipe.getOreOutput().asItem()));
-    if (recipe.getBonus() != null) {
-      builder.addSlot(RecipeIngredientRole.OUTPUT, 129, 39).addItemStack(new ItemStack(recipe.getBonus().asItem()));
+    builder.addSlot(RecipeIngredientRole.OUTPUT, 129, 19).addItemStack(recipe.getResultItem());
+    if (recipe.hasBonus()) {
+      builder.addSlot(RecipeIngredientRole.OUTPUT, 129, 39).addItemStack(new ItemStack(recipe.getBonus().getBlock()));
     }
   }
 

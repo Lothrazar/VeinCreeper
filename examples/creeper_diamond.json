@@ -3,7 +3,7 @@
 	"input": {
 		"item": "minecraft:diamond"
 	},
-	"trappedEntity": {
+	"mob": {
 		"entity": "minecraft:creeper",
 		"nbt":{"OnGround":1} 
 	},

@@ -3,7 +3,7 @@
 	"input": {
 		"item": "minecraft:gunpowder"
 	},
-	"trappedEntity": {
+	"mob": {
 		"entity": "minecraft:creeper",
 		"nbt":{"ignited": false, "OnGround":1} 
 	},

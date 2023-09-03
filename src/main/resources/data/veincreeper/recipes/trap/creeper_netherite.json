@@ -1,19 +1,19 @@
 {
 	"type": "veincreeper:trap",
 	"input": {
-		"item": "minecraft:lapis_lazuli"
+		"item": "minecraft:netherite_ingot"
 	},
 	"mob": {
 		"entity": "minecraft:creeper",
 		"nbt":{"OnGround":1} 
 	},
 	"result": {
-		"entity": "veincreeper:lapis_creeper"
+		"entity": "veincreeper:netherite_creeper"
 	},
 	"conditions": [
 		{
 			"type": "flib:entity_exists",
-			"value": "veincreeper:lapis_creeper"
+			"value": "veincreeper:netherite_creeper"
 		}
 	]
 }

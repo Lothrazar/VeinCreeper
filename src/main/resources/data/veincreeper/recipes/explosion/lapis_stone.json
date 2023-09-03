@@ -7,7 +7,7 @@
 	"ore": {
 		"block": "minecraft:lapis_ore",
 		"bonus": "minecraft:lapis_block",
-		"bonusChance": 15.0
+		"bonusChance": 15
 	},
 	"conditions": [
 		{

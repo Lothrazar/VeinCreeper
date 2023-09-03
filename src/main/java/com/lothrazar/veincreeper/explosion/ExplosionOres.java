@@ -92,15 +92,15 @@ public class ExplosionOres extends Explosion {
             }
             recipeFound = true;
             //BONUS? or normal
-            if (recipe.getBonus() != null && recipe.getBonusChance() > 0
-                && (recipe.getBonusChance() / 100F) > level.random.nextDouble()) {
+            if (recipe.hasBonus()
+                && (recipe.getBonus().getChance() / 100F) > level.random.nextDouble()) {
               //ok
-              toReplace.put(blockpos1, recipe.getBonus().defaultBlockState());
+              toReplace.put(blockpos1, recipe.getBonus().getBlock().defaultBlockState());
               VeinCreeperMod.LOGGER.info("Explosion recipe applied BONUS " + recipe.getId());
             }
             else {
               //default to always replace to non-bonus
-              toReplace.put(blockpos1, recipe.getOreOutput().defaultBlockState());
+              toReplace.put(blockpos1, recipe.getOre().getBlock().defaultBlockState());
               VeinCreeperMod.LOGGER.info("Explosion recipe applied to world " + recipe.getId());
             }
             break; // found a matching recipe for this block state, AND did a replacement

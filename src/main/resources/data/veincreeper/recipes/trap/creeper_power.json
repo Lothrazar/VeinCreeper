@@ -3,7 +3,7 @@
 	"input": {
 		"item": "minecraft:ghast_tear"
 	},
-	"trappedEntity": {
+	"mob": {
 		"entity": "minecraft:creeper",
 		"nbt":{"powered": false, "OnGround":1} 
 	},

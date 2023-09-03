@@ -17,7 +17,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 @ZenRegister
 @ZenCodeType.Name("mods.veincreeper.explosion")
-public class CreeperZen implements IRecipeManager<ExplosionRecipe> {
+public class ExplosionRecipeZen implements IRecipeManager<ExplosionRecipe> {
 
   @Override
   public RecipeType<ExplosionRecipe> getRecipeType() {
@@ -42,11 +42,11 @@ public class CreeperZen implements IRecipeManager<ExplosionRecipe> {
     TagKey<Block> targetMe = TagKey.create(Registries.BLOCK, new ResourceLocation(blockTagTarget));
     Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockResult));
     Block bonus = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(bonusId));
-    ExplosionRecipe m = new ExplosionRecipe(new ResourceLocation("crafttweaker", name), new ResourceLocation(entityType),
-        targetMe,
-        ore, bonus, chance);
-    CraftTweakerAPI.apply(new ActionAddRecipe<ExplosionRecipe>(this, m, ""));
-    VeinCreeperMod.LOGGER.info("crafttweaker: Recipe loaded " + m.getId().toString());
+    //    ExplosionRecipe m = new ExplosionRecipe(new ResourceLocation("crafttweaker", name), new ResourceLocation(entityType),
+    //        targetMe,
+    //        ore, bonus, chance);
+    //    CraftTweakerAPI.apply(new ActionAddRecipe<ExplosionRecipe>(this, m, ""));
+    //    VeinCreeperMod.LOGGER.info("crafttweaker: Recipe loaded " + m.getId().toString());
   }
 
   @ZenCodeType.Method
