@@ -171,7 +171,7 @@ public class TrapRecipe implements Recipe<Container> {
           tagMatch = (inputTags.getInt(key) == entityData.getInt(key));
           matches = matches && tagMatch;
           if (!tagMatch) {
-            VeinCreeperMod.LOGGER.info("FAILED integer tagmatch from recipe " + entityData);
+            VeinCreeperMod.LOGGER.info("FAILED integer tagmatch from recipe " + entityData + "!!" + inputTags);
           }
         }
         if (inputTags.getTagType(key) == Tag.TAG_SHORT) {
@@ -208,10 +208,11 @@ public class TrapRecipe implements Recipe<Container> {
     var entityFromRecipe = ForgeRegistries.ENTITY_TYPES.getValue(this.outputEntity.getEntityId());
     if (entityFromRecipe == null) {
       VeinCreeperMod.LOGGER.error("Recipe spawn failed, entity not registered " + entityFromRecipe);
+      return;
     }
     // 
     if (this.inputEntity.getEntityId().equals(this.outputEntity.getEntityId())) {
-      VeinCreeperMod.LOGGER.info("haha haxor keep same entity dont make a new one duh");
+      //      VeinCreeperMod.LOGGER.info("haha haxor keep same entity dont make a new one duh");
     }
     else {
       //ok normal flow
@@ -222,7 +223,6 @@ public class TrapRecipe implements Recipe<Container> {
       VeinCreeperMod.LOGGER.info("spawn New entity from type  " + entityFromRecipe);
       entityToKill = entityFromRecipe.spawn(level, pos, MobSpawnType.CONVERSION);
     }
-    VeinCreeperMod.LOGGER.info("spawnEntityResult " + this.outputEntity);
     var inputTags = this.inputEntity.getNbt();
     var outputTags = this.outputEntity.getNbt();
     if (!outputTags.isEmpty()) {
@@ -230,29 +230,28 @@ public class TrapRecipe implements Recipe<Container> {
       CompoundTag entityData = new CompoundTag(); // bullshit what it isentity.getPersistentData();
       entityToKill.save(entityData); //save WITH ID?
       for (String key : outputTags.getAllKeys()) {
-        VeinCreeperMod.LOGGER.info(" outputTags = " + outputTags);
         if (inputTags.getTagType(key) == Tag.TAG_INT) {
-          VeinCreeperMod.LOGGER.info("WRITE int//short spawning " + outputTags.getInt(key));
+          VeinCreeperMod.LOGGER.debug("WRITE int//short spawning " + outputTags.getInt(key));
           entityData.putInt(key, outputTags.getInt(key));
         }
         else if (inputTags.getTagType(key) == Tag.TAG_BYTE) {
-          VeinCreeperMod.LOGGER.info("WRITE bool " + outputTags.getBoolean(key));
+          VeinCreeperMod.LOGGER.debug("WRITE bool " + outputTags.getBoolean(key));
           entityData.putBoolean(key, outputTags.getBoolean(key));
         }
         else if (inputTags.getTagType(key) == Tag.TAG_STRING) {
-          VeinCreeperMod.LOGGER.info("WRITE STR " + outputTags.getString(key));
+          VeinCreeperMod.LOGGER.debug("WRITE STR " + outputTags.getString(key));
           entityData.putString(key, outputTags.getString(key));
         }
         else {
-          VeinCreeperMod.LOGGER.info(this.id + "unknown type!!!!!!!!!!!!!!!!!! " + inputTags.getTagType(key));
+          VeinCreeperMod.LOGGER.error(this.id + " NBT unsupported type, more may come in future versions" + inputTags.getTagType(key));
         }
       }
-      VeinCreeperMod.LOGGER.info("actually load nbt into entityData=" + entityData);
+      //      VeinCreeperMod.LOGGER.debug("actually load nbt into entityData=" + entityData);
       entityToKill.load(entityData);
     }
-    else {
-      VeinCreeperMod.LOGGER.info("output tags empty for recipe " + this.id);
-    }
+    //    else {
+    //      VeinCreeperMod.LOGGER.debug("output tags empty for recipe " + this.id);
+    //    }
   }
 
   public Ingredient getInput() {

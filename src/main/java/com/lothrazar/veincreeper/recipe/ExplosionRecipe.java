@@ -162,12 +162,8 @@ public class ExplosionRecipe implements Recipe<Container> {
   public boolean matches(Entity exploder, BlockState blockstate) {
     final String key = CreeperConfigManager.getKeyFromEntity(exploder);
     var src = entityType.getEntityId().getPath().toString();
-    VeinCreeperMod.LOGGER.info(" ** " + this.id);
-    VeinCreeperMod.LOGGER.info("  " + src + " vs " + key);
-    VeinCreeperMod.LOGGER.info("   " + blockstate + " vs " + replace);
     //namespace is always mod id. at least for this recipe
     boolean match = src.equals(key) && blockstate.is(replace);
-    VeinCreeperMod.LOGGER.info("   match=" + match);
     return match;
   }
 

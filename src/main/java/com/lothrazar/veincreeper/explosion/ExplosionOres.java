@@ -80,7 +80,7 @@ public class ExplosionOres extends Explosion {
           //overrides 
           final String key = CreeperConfigManager.getKeyFromEntity(this.getExploder());
           if (!CreeperRegistry.CREEPERS.containsKey(key)) {
-            VeinCreeperMod.LOGGER.info("Missing type from explosion " + key);
+            VeinCreeperMod.LOGGER.error("Missing type from explosion " + key);
             return;
           }
           var type = CreeperRegistry.CREEPERS.get(key);
