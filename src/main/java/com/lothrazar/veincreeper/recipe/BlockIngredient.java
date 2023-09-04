@@ -12,9 +12,9 @@ public class BlockIngredient {
     this.chance = null;
   }
 
-  public BlockIngredient(Block b, int bonus) {
+  public BlockIngredient(Block b, Integer bonus) {
     this.block = b;
-    this.chance = Integer.valueOf(bonus);
+    this.chance = bonus;
   }
 
   public Block getBlock() {
