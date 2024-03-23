@@ -5,7 +5,6 @@ import java.util.Map;
 import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
 import com.lothrazar.veincreeper.conf.CreeperConfigManager;
-import com.lothrazar.veincreeper.entity.VeinCreeper;
 import com.lothrazar.veincreeper.recipe.ExplosionRecipe;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -13,8 +12,6 @@ import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -53,11 +50,20 @@ public class ExplosionOres extends Explosion {
     this.blockInteraction = bi;
   }
 
+  public double x() {
+    return x;
+  }
+
+  public double y() {
+    return y;
+  }
+
+  public double z() {
+    return z;
+  }
+
   @Override
   public void finalizeExplosion(boolean p_46076_) {
-    if (this.level.isClientSide) {
-      this.level.playLocalSound(this.x, this.y, this.z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 4.0F, (1.0F + (this.level.random.nextFloat() - this.level.random.nextFloat()) * 0.2F) * 0.7F, false);
-    }
     boolean flag = this.interactsWithBlocks();
     if (p_46076_) {
       if (!(this.radius < 2.0F) && flag) {
@@ -105,15 +111,6 @@ public class ExplosionOres extends Explosion {
             }
             break; // found a matching recipe for this block state, AND did a replacement
           }
-          if (!recipeFound && this.getExploder() instanceof VeinCreeper) {
-            VeinCreeperMod.LOGGER.error(blockstate + "No recipe found. Make sure to create your own recipes when creepers are added to the con: " + key);
-            //            VeinCreeperMod.LOGGER.error(" __________  " + blockstate);
-            //            VeinCreeperMod.LOGGER.error(" __________  " + key);
-            VeinCreeperMod.LOGGER.error(" __________  " + blockpos);
-          }
-          //          else
-          //            VeinCreeperMod.LOGGER.error("ERROR! no valid oreconfigs found for mob " + key);
-          //
           if (!recipeFound && type.isDestructive() && blockstate.canDropFromExplosion(this.level, blockpos, this)) {
             //regular explosm stuff on non-converted blocks
             if (this.level instanceof ServerLevel serverlevel) {
@@ -129,7 +126,9 @@ public class ExplosionOres extends Explosion {
               });
             }
           }
-          if (!recipeFound && type.isDestructive()) blockstate.onBlockExploded(this.level, blockpos, this);
+          if (!recipeFound && type.isDestructive()) {
+            blockstate.onBlockExploded(this.level, blockpos, this);
+          }
           this.level.getProfiler().pop();
         }
       }
