@@ -1,5 +1,6 @@
 package com.lothrazar.veincreeper.entity;
 
+import com.lothrazar.veincreeper.VeinCreeperMod;
 import com.lothrazar.veincreeper.conf.CreeperConfigManager;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.CreeperRenderer;
@@ -17,6 +18,9 @@ public class VeinCreeperRender extends CreeperRenderer {
     this.model = new VeinCreeperModel<>(ctx.bakeLayer(ModelLayers.CREEPER));
   }
 
+  private static final ResourceLocation NEW_CREEPER = new ResourceLocation(VeinCreeperMod.MODID,
+      "textures/entity/creeper.png");
+
   @Override
   public ResourceLocation getTextureLocation(Creeper entity) {
     var cm = (VeinCreeperModel) this.model;
@@ -26,6 +30,6 @@ public class VeinCreeperRender extends CreeperRenderer {
       var col = CreeperConfigManager.getCreeperColor(key);
       cm.setColor(new int[] { col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha() });
     }
-    return super.getTextureLocation(entity);
+    return NEW_CREEPER;
   }
 }
