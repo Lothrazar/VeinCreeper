@@ -1,7 +1,11 @@
 package com.lothrazar.veincreeper.recipe.jei;
 
+import java.util.List;
+import org.joml.Quaternionf;
+import com.google.common.collect.Lists;
 import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
+import com.lothrazar.veincreeper.entity.VeinCreeper;
 import com.lothrazar.veincreeper.recipe.ExplosionRecipe;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -13,11 +17,16 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class ExplosionCatalyst implements IRecipeCategory<ExplosionRecipe> {
 
@@ -43,26 +52,47 @@ public class ExplosionCatalyst implements IRecipeCategory<ExplosionRecipe> {
 
   @Override
   public Component getTitle() {
-    return Component.translatable(VeinCreeperMod.MODID + ".explosion");
+    return Component.translatable(VeinCreeperMod.MODID + ".explosion.jei");
   }
 
   @Override
   public void draw(ExplosionRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics ms, double mouseX, double mouseY) {
     var font = Minecraft.getInstance().font;
     final int FONT = 0xEEEEEE;
-    TagKey<Block> tag = recipe.getReplace();
-    ms.drawString(font, tag.location().toString() + " ", 0, 0, FONT);
-    ms.drawString(font, recipe.getEntityType().toString() + " ", 0, 60, FONT);
+    // the regular ore
+    // render bonus ore if it has any
     if (recipe.hasBonus()) {
       ms.drawString(font, recipe.getBonus().getChance() + "%", 148, 46, FONT);
+    }
+    //render the entity 
+    try {
+      EntityType<?> entityType = EntityType.byString(recipe.getEntityType().toString()).orElse(null);
+      LivingEntity fakeEntity = (LivingEntity) entityType.create(Minecraft.getInstance().level);
+      Quaternionf ANGLE = (new Quaternionf()).rotationXYZ(0.43633232F, 2.1F, (float) Math.PI);
+      InventoryScreen.renderEntityInInventory(ms, 30, 64, 25, ANGLE, (Quaternionf) null, fakeEntity);
+      if (fakeEntity instanceof VeinCreeper creeper) {
+        ms.drawString(font, creeper.getDisplayName(), 2, 2, FONT);
+      }
+    }
+    catch (Exception e) {
+      VeinCreeperMod.LOGGER.error("Creeper rendering in jei plugin failed ", e);
     }
   }
 
   @Override
   public void setRecipe(IRecipeLayoutBuilder builder, ExplosionRecipe recipe, IFocusGroup focuses) {
-    // TagKey<Block> tag = recipe.getReplace();
+    //from the block tag, convert to list of item stacks to render possible ingredients 
+    TagKey<Block> tag = recipe.getReplace();
+    List<ItemStack> list = Lists.newArrayList();
+    for (var holder : ForgeRegistries.BLOCKS.getEntries()) {
+      Block block = holder.getValue();
+      if (block.defaultBlockState().is(tag)) {
+        list.add(new ItemStack(block));
+      }
+    }
     // 
-    //    builder.addSlot(RecipeIngredientRole.INPUT, 4, 19).addIngredients(Ingredient.of(tag));
+    builder.addSlot(RecipeIngredientRole.INPUT, 64, 29).addIngredients(Ingredient.of(list.stream()));
+    //
     builder.addSlot(RecipeIngredientRole.OUTPUT, 129, 19).addItemStack(recipe.getResultItem());
     if (recipe.hasBonus()) {
       builder.addSlot(RecipeIngredientRole.OUTPUT, 129, 39).addItemStack(new ItemStack(recipe.getBonus().getBlock()));

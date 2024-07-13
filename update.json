@@ -8,6 +8,7 @@
     "1.0.0":"First release, includes two recipe types with json and zenscript support, the trap block, and config file for dynamic creeper types",
     "1.0.1":"Fix creeper hitbox size, shrunk down to match vanilla creeper (0.6 by 1.7)"
   	,"1.0.2":"Fix creeper explosions not playing sounds correctly"
-  	,"1.1.0":"new creeper texture (without the regular mobs green tint) by Marioluigi7896 "
+  	,"1.1.0":"New creeper texture (without the regular mobs green tint) by Marioluigi7896 "
+  	,"1.2.0":"New JEI plugin to show recipes and render the creeper"
   }
 }
