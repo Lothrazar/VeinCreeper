@@ -52,7 +52,7 @@ public class CreeperRegistry {
   public static final RegistryObject<SerializePartyRecipe> R_SERIALIZER = RECIPE_SERIALIZERS.register("explosion", SerializePartyRecipe::new);
   public static final RegistryObject<RecipeType<TrapRecipe>> TRAP_RECIPE = RECIPE_TYPES.register("trap", () -> new RecipeType<TrapRecipe>() {});
   public static final RegistryObject<SerializeTrapRecipe> TRAP_SERIALIZER = RECIPE_SERIALIZERS.register("trap", SerializeTrapRecipe::new);
-  static Builder<VeinCreeper> BUILDER = EntityType.Builder.<VeinCreeper> of(VeinCreeper::new, MobCategory.MISC).sized(0.6F, 1.7F).clientTrackingRange(10);
+  static Builder<VeinCreeper> BUILDER = EntityType.Builder.<VeinCreeper> of(VeinCreeper::new, MobCategory.MONSTER).sized(0.6F, 1.7F).clientTrackingRange(10);
   public static Map<String, VeinCreeperType> CREEPERS;
   private static final ArrayList<ForgeSpawnEggItem> EGGIES = new ArrayList<>();
 

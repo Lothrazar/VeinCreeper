@@ -1,7 +1,7 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/vein-creeper",
   "promos": {
-    "1.20.1-latest": "1.1.0"
+    "1.20.1-latest": "1.2.1"
   },
   "1.20.1": {
     "0.0.1": "Testing build ",
@@ -10,5 +10,6 @@
   	,"1.0.2":"Fix creeper explosions not playing sounds correctly"
   	,"1.1.0":"New creeper texture (without the regular mobs green tint) by Marioluigi7896 "
   	,"1.2.0":"New JEI plugin to show recipes and render the creeper"
+  	,"1.2.1":"Register vein creepers as type MONSTER instead of MISC fixes #2"
   }
 }
