@@ -3,7 +3,7 @@ package com.lothrazar.veincreeper.recipe;
 import java.util.Optional;
 import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
-import com.lothrazar.veincreeper.config.CreeperConfigManager;
+import com.lothrazar.veincreeper.config.VeinCreeperData;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
@@ -143,7 +143,7 @@ public class ExplosionRecipe implements Recipe<RecipeInput> {
   }
 
   public boolean matches(Entity exploder, BlockState blockstate) {
-    final String key = CreeperConfigManager.getKeyFromEntity(exploder);
+    final String key = VeinCreeperData.getKeyFromEntity(exploder);
     var src = entityType.getEntityId().getPath().toString();
     boolean match = src.equals(key) && blockstate.is(replace);
     return match;

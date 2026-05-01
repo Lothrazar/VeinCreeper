@@ -35,7 +35,7 @@ public class ExplosionRecipeZen implements IRecipeManager<ExplosionRecipe> {
         targetMe, ore);
     ResourceLocation id = ResourceLocation.fromNamespaceAndPath(CraftTweakerConstants.MOD_ID, name);
     CraftTweakerAPI.apply(new ActionAddRecipe<>(this, new RecipeHolder<>(id, m)));
-    VeinCreeperMod.LOGGER.info("zs explosion: Recipe loaded " + id);
+    VeinCreeperMod.LOGGER.debug("zs explosion: Recipe loaded " + id);
   }
 
   @ZenCodeType.Method
@@ -48,12 +48,12 @@ public class ExplosionRecipeZen implements IRecipeManager<ExplosionRecipe> {
         targetMe, ore, bonus, chance);
     ResourceLocation id = ResourceLocation.fromNamespaceAndPath(CraftTweakerConstants.MOD_ID, name);
     CraftTweakerAPI.apply(new ActionAddRecipe<>(this, new RecipeHolder<>(id, m)));
-    VeinCreeperMod.LOGGER.info("zs explosion: Recipe loaded " + id);
+    VeinCreeperMod.LOGGER.debug("zs explosion: Recipe loaded " + id);
   }
 
   @ZenCodeType.Method
   public void removeRecipe(String... names) {
     removeByName(names);
-    VeinCreeperMod.LOGGER.info("zs explosion: Recipe removed " + java.util.Arrays.toString(names));
+    VeinCreeperMod.LOGGER.debug("zs explosion: Recipe removed " + java.util.Arrays.toString(names));
   }
 }

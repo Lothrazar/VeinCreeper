@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
-import com.lothrazar.veincreeper.config.CreeperConfigManager;
+import com.lothrazar.veincreeper.config.VeinCreeperData;
 import com.lothrazar.veincreeper.recipe.ExplosionRecipe;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -75,12 +75,12 @@ public class ExplosionOres extends Explosion {
         if (!blockstate.isAir()) {
           BlockPos blockpos1 = blockpos.immutable();
           //overrides
-          final String key = CreeperConfigManager.getKeyFromEntity(this.getDirectSourceEntity());
-          if (!CreeperRegistry.CREEPERS.containsKey(key)) {
+          final String key = VeinCreeperData.getKeyFromEntity(this.getDirectSourceEntity());
+          if (!VeinCreeperData.CREEPERS.containsKey(key)) {
             VeinCreeperMod.LOGGER.error("Missing type from explosion " + key);
             return;
           }
-          var type = CreeperRegistry.CREEPERS.get(key);
+          var type = VeinCreeperData.CREEPERS.get(key);
           //itsa valid entity, so NOW check recipe
           boolean recipeFound = false;
           for (RecipeHolder<ExplosionRecipe> holder : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.EXPLOSION_RECIPE.get())) {
@@ -92,11 +92,11 @@ public class ExplosionOres extends Explosion {
             if (recipe.hasBonus()
                 && (recipe.getBonus().getChance() / 100F) > level.random.nextDouble()) {
               toReplace.put(blockpos1, recipe.getBonus().getBlock().defaultBlockState());
-              VeinCreeperMod.LOGGER.info("Explosion recipe applied BONUS " + holder.id());
+              VeinCreeperMod.LOGGER.debug("Explosion recipe applied BONUS " + holder.id() +" at " + blockpos1);
             }
             else {
               toReplace.put(blockpos1, recipe.getOre().getBlock().defaultBlockState());
-              VeinCreeperMod.LOGGER.info("Explosion recipe applied to world " + holder.id());
+              VeinCreeperMod.LOGGER.debug("Explosion recipe applied to world " + holder.id() +" at " + blockpos1);
             }
             break;
           }

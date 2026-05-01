@@ -1,7 +1,7 @@
 package com.lothrazar.veincreeper.entity;
 
 import com.lothrazar.library.util.SoundUtil;
-import com.lothrazar.veincreeper.config.CreeperConfigManager;
+import com.lothrazar.veincreeper.config.VeinCreeperData;
 import com.lothrazar.veincreeper.config.VeinCreeperType;
 import com.lothrazar.veincreeper.explosion.ExplosionOres;
 import net.minecraft.core.particles.ParticleTypes;
@@ -21,7 +21,7 @@ public class VeinCreeper extends Creeper {
 
   public VeinCreeper(EntityType<VeinCreeper> t, Level level) {
     super(t, level);
-    this.creeperType = CreeperConfigManager.getCreepType(t);
+    this.creeperType = VeinCreeperData.getCreepType(t);
   }
 
   @Override

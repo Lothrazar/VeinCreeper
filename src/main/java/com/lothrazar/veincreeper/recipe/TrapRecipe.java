@@ -162,10 +162,10 @@ public class TrapRecipe implements Recipe<RecipeInput> {
     }
     else {
       if (entityToKill instanceof Player == false) {
-        VeinCreeperMod.LOGGER.info("kill and remove enitty" + entityToKill);
+        VeinCreeperMod.LOGGER.debug("kill and remove enitty" + entityToKill);
         entityToKill.remove(RemovalReason.KILLED);
       }
-      VeinCreeperMod.LOGGER.info("spawn New entity from type  " + entityFromRecipe);
+      VeinCreeperMod.LOGGER.debug("spawn New entity from type  " + entityFromRecipe);
       entityToKill = entityFromRecipe.spawn(level, pos, MobSpawnType.CONVERSION);
     }
     var inputTags = this.inputEntity.getNbt();

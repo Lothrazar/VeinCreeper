@@ -1,7 +1,7 @@
 package com.lothrazar.veincreeper.entity;
 
 import com.lothrazar.veincreeper.VeinCreeperMod;
-import com.lothrazar.veincreeper.config.CreeperConfigManager;
+import com.lothrazar.veincreeper.config.VeinCreeperData;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.CreeperRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -26,8 +26,8 @@ public class VeinCreeperRender extends CreeperRenderer {
     var cm = (VeinCreeperModel) this.model;
     if (cm.getColor() == null
         || doRefresh) {
-      final String key = CreeperConfigManager.getKeyFromEntity(entity);
-      var col = CreeperConfigManager.getCreeperColor(key);
+      final String key = VeinCreeperData.getKeyFromEntity(entity);
+      var col = VeinCreeperData.getCreeperColor(key);
       cm.setColor(new int[] { col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha() });
     }
     return NEW_CREEPER;
