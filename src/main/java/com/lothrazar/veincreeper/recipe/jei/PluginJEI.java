@@ -18,7 +18,7 @@ import net.minecraft.world.item.ItemStack;
 @JeiPlugin
 public class PluginJEI implements IModPlugin {
 
-  private static final ResourceLocation ID = new ResourceLocation(VeinCreeperMod.MODID, "jei");
+  private static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(VeinCreeperMod.MODID, "jei");
 
   @Override
   public ResourceLocation getPluginUid() {
@@ -28,7 +28,6 @@ public class PluginJEI implements IModPlugin {
   @Override
   public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
     registration.addRecipeCatalyst(new ItemStack(CreeperRegistry.TRAP.get()), TrapCatalyst.TYPE);
-    //    registration.addRecipeCatalyst(new ItemStack(CreeperRegistry.TRAP.get()), ExplosionCatalyst.TYPE);
   }
 
   @Override
@@ -41,7 +40,7 @@ public class PluginJEI implements IModPlugin {
   @Override
   public void registerRecipes(IRecipeRegistration registry) {
     ClientLevel world = Objects.requireNonNull(Minecraft.getInstance().level);
-    registry.addRecipes(ExplosionCatalyst.TYPE, List.copyOf(world.getRecipeManager().getAllRecipesFor(CreeperRegistry.EXPLOSION_RECIPE.get())));
-    registry.addRecipes(TrapCatalyst.TYPE, List.copyOf(world.getRecipeManager().getAllRecipesFor(CreeperRegistry.TRAP_RECIPE.get())));
+    registry.addRecipes(ExplosionCatalyst.TYPE, List.copyOf(world.getRecipeManager().getAllRecipesFor(CreeperRegistry.EXPLOSION_RECIPE.get()).stream().map(h -> h.value()).toList()));
+    registry.addRecipes(TrapCatalyst.TYPE, List.copyOf(world.getRecipeManager().getAllRecipesFor(CreeperRegistry.TRAP_RECIPE.get()).stream().map(h -> h.value()).toList()));
   }
 }

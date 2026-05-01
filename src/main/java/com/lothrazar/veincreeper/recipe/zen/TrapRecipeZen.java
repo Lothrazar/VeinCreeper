@@ -2,6 +2,7 @@ package com.lothrazar.veincreeper.recipe.zen;
 
 import org.openzen.zencode.java.ZenCodeType;
 import com.blamejared.crafttweaker.api.CraftTweakerAPI;
+import com.blamejared.crafttweaker.api.CraftTweakerConstants;
 import com.blamejared.crafttweaker.api.action.recipe.ActionAddRecipe;
 import com.blamejared.crafttweaker.api.annotation.ZenRegister;
 import com.blamejared.crafttweaker.api.ingredient.IIngredient;
@@ -10,6 +11,7 @@ import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
 import com.lothrazar.veincreeper.recipe.TrapRecipe;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 
 @ZenRegister
@@ -24,18 +26,18 @@ public class TrapRecipeZen implements IRecipeManager<TrapRecipe> {
   @ZenCodeType.Method
   public void addRecipe(String name, IIngredient input, String entityType, String entityOut) {
     name = fixRecipeName(name);
-    TrapRecipe m = new TrapRecipe(new ResourceLocation("crafttweaker", name),
-        input.asVanillaIngredient(),
-        new ResourceLocation(entityType),
-        new ResourceLocation(entityOut),
+    TrapRecipe m = new TrapRecipe(input.asVanillaIngredient(),
+        ResourceLocation.parse(entityType),
+        ResourceLocation.parse(entityOut),
         null, null);
-    CraftTweakerAPI.apply(new ActionAddRecipe<TrapRecipe>(this, m, ""));
-    VeinCreeperMod.LOGGER.info("zs trap: Recipe loaded " + m.getId().toString());
+    ResourceLocation id = ResourceLocation.fromNamespaceAndPath(CraftTweakerConstants.MOD_ID, name);
+    CraftTweakerAPI.apply(new ActionAddRecipe<>(this, new RecipeHolder<>(id, m)));
+    VeinCreeperMod.LOGGER.info("zs trap: Recipe loaded " + id);
   }
 
   @ZenCodeType.Method
   public void removeRecipe(String... names) {
     removeByName(names);
-    VeinCreeperMod.LOGGER.info("zs trap: Recipe removed " + names);
+    VeinCreeperMod.LOGGER.info("zs trap: Recipe removed " + java.util.Arrays.toString(names));
   }
 }

@@ -7,8 +7,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 
 public class RenderMobTrap implements BlockEntityRenderer<TileMobTrap> {
 
@@ -16,7 +15,7 @@ public class RenderMobTrap implements BlockEntityRenderer<TileMobTrap> {
 
   @Override
   public void render(TileMobTrap tile, float v, PoseStack matrixStack, MultiBufferSource buffer, int light, int overlayLight) {
-    IItemHandler itemHandler = tile.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+    IItemHandler itemHandler = tile.getInventory();
     if (itemHandler != null) {
       ItemStack stack = itemHandler.getStackInSlot(0);
       if (!stack.isEmpty()) {

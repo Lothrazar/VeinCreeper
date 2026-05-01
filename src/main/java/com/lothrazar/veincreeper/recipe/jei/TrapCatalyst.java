@@ -18,14 +18,14 @@ import net.minecraft.resources.ResourceLocation;
 
 public class TrapCatalyst implements IRecipeCategory<TrapRecipe> {
 
-  public static final ResourceLocation ID = new ResourceLocation(CreeperRegistry.TRAP_RECIPE.getId().toString());
+  public static final ResourceLocation ID = CreeperRegistry.TRAP_RECIPE.getId();
   static final RecipeType<TrapRecipe> TYPE = new RecipeType<>(ID, TrapRecipe.class);
   private IDrawable gui;
   private IDrawable icon;
 
   public TrapCatalyst(IGuiHelper helper) {
-    gui = helper.drawableBuilder(new ResourceLocation(VeinCreeperMod.MODID, "textures/gui/jei_trap.png"), 0, 0, 169, 69).setTextureSize(169, 69).build();
-    icon = helper.drawableBuilder(new ResourceLocation(VeinCreeperMod.MODID, "textures/block/trap.png"), 0, 0, 16, 16).setTextureSize(16, 16).build();
+    gui = helper.drawableBuilder(ResourceLocation.fromNamespaceAndPath(VeinCreeperMod.MODID, "textures/gui/jei_trap.png"), 0, 0, 169, 69).setTextureSize(169, 69).build();
+    icon = helper.drawableBuilder(ResourceLocation.fromNamespaceAndPath(VeinCreeperMod.MODID, "textures/block/trap.png"), 0, 0, 16, 16).setTextureSize(16, 16).build();
   }
 
   @Override
@@ -33,6 +33,7 @@ public class TrapCatalyst implements IRecipeCategory<TrapRecipe> {
     return icon;
   }
 
+  @SuppressWarnings("removal")
   @Override
   public IDrawable getBackground() {
     return gui;
@@ -53,13 +54,7 @@ public class TrapCatalyst implements IRecipeCategory<TrapRecipe> {
 
   @Override
   public void setRecipe(IRecipeLayoutBuilder builder, TrapRecipe recipe, IFocusGroup focuses) {
-    //    TagKey<Block> tag = recipe.getReplace();
-    //    //addIngredients
     builder.addSlot(RecipeIngredientRole.INPUT, 4, 19).addIngredients(recipe.getInput());
-    //INPUT mob and output mob write
-    //    builder.addSlot(RecipeIngredientRole.OUTPUT, 108, 19).addItemStack(new ItemStack(recipe.getOreOutput().asItem()));
-    //    if (recipe.getBonus() != null)
-    //      builder.addSlot(RecipeIngredientRole.OUTPUT, 138, 19).addItemStack(new ItemStack(recipe.getBonus().asItem()));
   }
 
   @Override

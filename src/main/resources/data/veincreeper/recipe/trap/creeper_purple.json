@@ -1,0 +1,20 @@
+{
+	"type": "veincreeper:trap",
+	"input": {
+		"tag": "c:dyes/purple"
+	},
+	"mob": {
+		"entity": "minecraft:creeper",
+		"nbt":{"OnGround":1} 
+	},
+	"result": {
+		"entity": "veincreeper:purple_creeper",
+		"nbt":{"powered": true} 
+	},
+	"conditions": [
+		{
+			"type": "flib:entity_exists",
+			"value": "veincreeper:purple_creeper"
+		}
+	]
+}

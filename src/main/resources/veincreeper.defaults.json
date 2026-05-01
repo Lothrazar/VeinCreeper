@@ -1,0 +1,108 @@
+{
+  "__comment": " id must be unique. There are two recipe types you will want to add after adding new creepers: 'veincreeper:explosion' recipes to make creeper explosions convert ore, and 'veincreeper:trap' recipes to convert mobs into other mobs on the trap block, so add these to your modpack/datapack/scripts based on how all vanilla ores are set up by default https://github.com/Lothrazar/VeinCreeper/tree/trunk/1.20/src/main/resources/data/veincreeper/recipes . Yes each creeper have multiple recipes of each type .  The 'id' string must exactly match the 'veincreeer' property used in the explosion recipe, this will link the creeper mob to the ore explosion recipe.  Colour values are used as an overlay to existing creeper texture. \n",
+  "creepers": [
+    {
+      "id": "coal_creeper",
+      "colour": "#281414",
+      "displayName": "Coal",
+      "dropsExp": true,
+      "destructive": false,
+      "radius": 2.2,
+      "fire": false,
+      "spawnEgg": true
+    },
+    {
+      "id": "iron_creeper",
+      "colour": "#823C14",
+      "displayName": "Iron",
+      "dropsExp": true,
+      "destructive": false,
+      "radius": 2.2,
+      "fire": false,
+      "spawnEgg": true
+    },
+    {
+      "id": "diamond_creeper",
+      "colour": "#39ADFA",
+      "displayName": "Diamond",
+      "dropsExp": true,
+      "destructive": false,
+      "radius": 2.2,
+      "fire": false,
+      "spawnEgg": true
+    },
+    {
+      "id": "copper_creeper",
+      "colour": "#f06d02",
+      "displayName": "Copper",
+      "dropsExp": true,
+      "destructive": false,
+      "radius": 2.3,
+      "fire": false,
+      "spawnEgg": true
+    },
+    {
+      "id": "gold_creeper",
+      "colour": "#F0F000",
+      "displayName": "Gold",
+      "dropsExp": true,
+      "destructive": false,
+      "radius": 2.5,
+      "fire": false,
+      "spawnEgg": true
+    },
+    {
+      "id": "redstone_creeper",
+      "colour": "#EB2300",
+      "displayName": "Redstone",
+      "dropsExp": false,
+      "destructive": false,
+      "radius": 2.5,
+      "fire": false,
+      "spawnEgg": true
+    },
+    {
+      "id": "lapis_creeper",
+      "colour": "#0000FF",
+      "displayName": "Lapis",
+      "dropsExp": true,
+      "destructive": false,
+      "radius": 2.5,
+      "fire": false,
+      "spawnEgg": true
+    },
+    {
+      "id": "emerald_creeper",
+      "colour": "#00FF00",
+      "displayName": "Emerald",
+      "dropsExp": false,
+      "destructive": false,
+      "radius": 2.6,
+      "fire": false,
+      "spawnEgg": true
+    },
+    {
+      "id": "quartz_creeper",
+      "colour": "#C7C5C5",
+      "displayName": "Quartz",
+      "dropsExp": true,
+      "destructive": true,
+      "radius": 2.5,
+      "fire": false,
+      "spawnEgg": true
+    },
+    {
+      "id": "purple_creeper",
+      "colour": "#FF00FF",
+      "displayName": "Purple",
+      "dropsExp": true,
+      "destructive": false,
+      "radius": 3.0,
+      "fire": false,
+      "spawnEgg": true
+    }
+  ]
+
+
+
+}

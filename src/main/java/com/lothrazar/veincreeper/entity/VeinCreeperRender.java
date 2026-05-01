@@ -1,7 +1,7 @@
 package com.lothrazar.veincreeper.entity;
 
 import com.lothrazar.veincreeper.VeinCreeperMod;
-import com.lothrazar.veincreeper.conf.CreeperConfigManager;
+import com.lothrazar.veincreeper.config.CreeperConfigManager;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.CreeperRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -18,7 +18,7 @@ public class VeinCreeperRender extends CreeperRenderer {
     this.model = new VeinCreeperModel<>(ctx.bakeLayer(ModelLayers.CREEPER));
   }
 
-  private static final ResourceLocation NEW_CREEPER = new ResourceLocation(VeinCreeperMod.MODID,
+  private static final ResourceLocation NEW_CREEPER = ResourceLocation.fromNamespaceAndPath(VeinCreeperMod.MODID,
       "textures/entity/creeper.png");
 
   @Override

@@ -7,9 +7,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.items.IItemHandler;
 
 public class TrapCreeperEvents {
 
@@ -23,7 +24,7 @@ public class TrapCreeperEvents {
     Level level = player.getCommandSenderWorld();
     BlockState state = level.getBlockState(pos);
     if (state.getBlock() == CreeperRegistry.TRAP.get()) {
-      var caps = level.getBlockEntity(pos).getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+      IItemHandler caps = level.getCapability(Capabilities.ItemHandler.BLOCK, pos, null);
       if (caps != null) {
         if (event.getItemStack().isEmpty()) {
           var found = caps.extractItem(0, 64, false);
@@ -39,7 +40,7 @@ public class TrapCreeperEvents {
           }
           else {
             //if caps item was empty we would not end up here.
-            //so they are both not empt 
+            //so they are both not empt
             var fromHand = event.getItemStack().copy();
             var fromBlock = caps.extractItem(0, 64, false);
             player.setItemInHand(event.getHand(), fromBlock);

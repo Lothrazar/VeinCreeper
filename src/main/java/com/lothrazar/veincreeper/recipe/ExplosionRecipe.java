@@ -1,49 +1,50 @@
 package com.lothrazar.veincreeper.recipe;
 
-import com.google.gson.JsonObject;
+import java.util.Optional;
 import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
-import com.lothrazar.veincreeper.conf.CreeperConfigManager;
-import net.minecraft.core.RegistryAccess;
+import com.lothrazar.veincreeper.config.CreeperConfigManager;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.ForgeRegistries;
 
-public class ExplosionRecipe implements Recipe<Container> {
+public class ExplosionRecipe implements Recipe<RecipeInput> {
 
-  private final ResourceLocation id;
-  //  "_comment":"veincreepers array. targets array. ore singular. bonus array",
-  private TagKey<Block> replace = BlockTags.STONE_ORE_REPLACEABLES;//list of TagIngredient
-  private BlockIngredient oreOutput = null; // list of BlockIngredient
-  private EntityIngredient entityType;// list
-  private BlockIngredient bonus = null;// BonusBlockIngredient
+  private TagKey<Block> replace = BlockTags.STONE_ORE_REPLACEABLES;
+  private BlockIngredient oreOutput = null;
+  private EntityIngredient entityType;
+  private BlockIngredient bonus = null;
 
-  public ExplosionRecipe(ResourceLocation id, ResourceLocation entityType,
+  public ExplosionRecipe(ResourceLocation entityType,
       TagKey<Block> blockReplace,
       Block result,
       Block bonus, Integer chance) {
     super();
-    this.id = id;
     this.replace = blockReplace;
     this.oreOutput = new BlockIngredient(result);
     this.entityType = new EntityIngredient(entityType);
     this.bonus = new BlockIngredient(bonus, chance);
   }
 
-  public ExplosionRecipe(ResourceLocation id, ResourceLocation entityType, TagKey<Block> input, Block result) {
-    this(id, entityType, input, result, null, null);
+  public ExplosionRecipe(ResourceLocation entityType, TagKey<Block> input, Block result) {
+    this(entityType, input, result, null, null);
   }
 
   public BlockIngredient getOre() {
@@ -51,13 +52,13 @@ public class ExplosionRecipe implements Recipe<Container> {
   }
 
   @Override
-  public boolean matches(Container c, Level level) {
-    return false; //never match any container
+  public boolean matches(RecipeInput c, Level level) {
+    return false;
   }
 
   @Override
-  public ItemStack assemble(Container c, RegistryAccess level) {
-    return getResultItem(level);
+  public ItemStack assemble(RecipeInput c, HolderLookup.Provider provider) {
+    return getResultItem(provider);
   }
 
   @Override
@@ -66,17 +67,12 @@ public class ExplosionRecipe implements Recipe<Container> {
   }
 
   @Override
-  public ItemStack getResultItem(RegistryAccess level) {
+  public ItemStack getResultItem(HolderLookup.Provider provider) {
     return getResultItem();
   }
 
   public ItemStack getResultItem() {
     return new ItemStack(oreOutput.getBlock());
-  }
-
-  @Override
-  public ResourceLocation getId() {
-    return id;
   }
 
   @Override
@@ -97,72 +93,58 @@ public class ExplosionRecipe implements Recipe<Container> {
     return bonus;
   }
 
+  private record OreData(Block ore, Optional<Block> bonus, Optional<Integer> bonusChance) {
+
+    static final MapCodec<OreData> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
+        BuiltInRegistries.BLOCK.byNameCodec().fieldOf("block").forGetter(OreData::ore),
+        BuiltInRegistries.BLOCK.byNameCodec().optionalFieldOf("bonus").forGetter(OreData::bonus),
+        com.mojang.serialization.Codec.INT.optionalFieldOf("bonusChance").forGetter(OreData::bonusChance)).apply(inst, OreData::new));
+  }
+
+  private record TargetData(TagKey<Block> tag) {
+
+    static final MapCodec<TargetData> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
+        TagKey.codec(Registries.BLOCK).fieldOf("tag").forGetter(TargetData::tag)).apply(inst, TargetData::new));
+  }
+
   public static class SerializePartyRecipe implements RecipeSerializer<ExplosionRecipe> {
+
+    public static final MapCodec<ExplosionRecipe> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
+        com.mojang.serialization.Codec.STRING.fieldOf("veincreeper").forGetter(r -> r.entityType.getEntityId().getPath()),
+        TargetData.CODEC.fieldOf("target").forGetter(r -> new TargetData(r.replace)),
+        OreData.CODEC.fieldOf("ore").forGetter(r -> new OreData(
+            r.oreOutput.getBlock(),
+            (r.bonus != null && r.bonus.getBlock() != null) ? Optional.of(r.bonus.getBlock()) : Optional.empty(),
+            (r.bonus != null && r.bonus.getChance() != null) ? Optional.of(r.bonus.getChance()) : Optional.empty()))).apply(inst, (creeperId, target, ore) -> {
+              ResourceLocation entity = ResourceLocation.fromNamespaceAndPath(VeinCreeperMod.MODID, creeperId);
+              VeinCreeperMod.LOGGER.debug("loading explosion recipe for " + entity);
+              if (ore.bonus().isPresent() && ore.bonusChance().isPresent()) {
+                return new ExplosionRecipe(entity, target.tag(), ore.ore(), ore.bonus().get(), ore.bonusChance().get());
+              }
+              return new ExplosionRecipe(entity, target.tag(), ore.ore());
+            }));
+    public static final StreamCodec<RegistryFriendlyByteBuf, ExplosionRecipe> STREAM_CODEC = StreamCodec.composite(
+        ResourceLocation.STREAM_CODEC, r -> r.entityType.getEntityId(),
+        ResourceLocation.STREAM_CODEC, r -> r.replace.location(),
+        ByteBufCodecs.registry(Registries.BLOCK), r -> r.oreOutput.getBlock(),
+        (entityId, tagLoc, block) -> new ExplosionRecipe(entityId, TagKey.create(Registries.BLOCK, tagLoc), block));
 
     public SerializePartyRecipe() {}
 
-    //    {
-    //      "type": "forge:mod_loaded",
-    //      "value": "veincreeper"
-    //      },
     @Override
-    public ExplosionRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
-      try {
-        String target = json.get("target").getAsJsonObject().get("tag").getAsString();
-        TagKey<Block> targetMe = TagKey.create(Registries.BLOCK, new ResourceLocation(target));
-        String creeperId = json.get(VeinCreeperMod.MODID).getAsString();
-        ResourceLocation entity = new ResourceLocation(VeinCreeperMod.MODID, creeperId);
-        JsonObject oreJson = json.get("ore").getAsJsonObject();
-        String blockId = oreJson.get("block").getAsString();
-        Block ore = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockId));
-        Block bonus = null;
-        int bonusChance = 0;
-        VeinCreeperMod.LOGGER.debug("loading explosion recipe  " + recipeId);
-        if (oreJson.has("bonus") && oreJson.has("bonusChance")) {
-          // optional bonus
-          String bonusId = oreJson.get("bonus").getAsString();
-          bonus = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(bonusId));
-          bonusChance = oreJson.get("bonusChance").getAsInt();
-          //
-          return new ExplosionRecipe(recipeId, entity, targetMe, ore, bonus, bonusChance);
-        }
-        else {
-          return new ExplosionRecipe(recipeId, entity, targetMe, ore);
-        }
-      }
-      catch (Exception e) {
-        VeinCreeperMod.LOGGER.error("Error loading recipe  " + recipeId, e);
-        return null;
-      }
+    public MapCodec<ExplosionRecipe> codec() {
+      return CODEC;
     }
 
     @Override
-    public ExplosionRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-      var target = buffer.readResourceLocation();
-      var block = buffer.readResourceLocation();
-      var entity = buffer.readResourceLocation();
-      ExplosionRecipe r = new ExplosionRecipe(recipeId,
-          entity,
-          TagKey.create(Registries.BLOCK, target),
-          ForgeRegistries.BLOCKS.getValue(block));
-      //server reading recipe from client or vice/versa 
-      return r;
-    }
-
-    @Override
-    public void toNetwork(FriendlyByteBuf buffer, ExplosionRecipe recipe) {
-      // replace, block, entity 
-      buffer.writeResourceLocation(recipe.replace.location());
-      var key = ForgeRegistries.BLOCKS.getKey(recipe.oreOutput.getBlock());
-      buffer.writeResourceLocation(key);
-      buffer.writeResourceLocation(recipe.entityType.getEntityId());
+    public StreamCodec<RegistryFriendlyByteBuf, ExplosionRecipe> streamCodec() {
+      return STREAM_CODEC;
     }
   }
 
   public boolean matches(Entity exploder, BlockState blockstate) {
     final String key = CreeperConfigManager.getKeyFromEntity(exploder);
     var src = entityType.getEntityId().getPath().toString();
-    //namespace is always mod id. at least for this recipe
     boolean match = src.equals(key) && blockstate.is(replace);
     return match;
   }
@@ -172,6 +154,6 @@ public class ExplosionRecipe implements Recipe<Container> {
   }
 
   public boolean hasBonus() {
-    return this.getBonus() != null && this.getBonus().getBlock() != null && this.getBonus().getChance() > 0;
+    return this.getBonus() != null && this.getBonus().getBlock() != null && this.getBonus().getChance() != null && this.getBonus().getChance() > 0;
   }
 }

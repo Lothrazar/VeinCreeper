@@ -14,6 +14,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -31,7 +32,8 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandler;
 
 public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBlock {
 
@@ -60,16 +62,13 @@ public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBl
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public FluidState getFluidState(BlockState state) {
     return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
   }
 
   public static final Predicate<Entity> DYE_FINDER = (p) -> {
     return p.isAlive() && p instanceof ItemEntity
-        && ((ItemEntity) p).getItem().getCount() > 0
-    //        && ((ItemEntity) p).getItem().getItem() instanceof DyeItem
-    ;
+        && ((ItemEntity) p).getItem().getCount() > 0;
   };
 
   @Override
@@ -77,15 +76,12 @@ public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBl
     if (sneakPlayerAvoid && entity instanceof Player && ((Player) entity).isCrouching()) {
       return;
     }
-    //are you alive instanceof LivingEntity alive
     if (this.requiresRedstoneSignal && !level.hasNeighborSignal(pos)) {
-      return; //i need signal to work, and there aint one
+      return;
     }
-    //else i dont need it. (or i do and i has it))
     BlockEntity blockEntity = level.getBlockEntity(pos);
-    if (!level.isClientSide &&
-        blockEntity instanceof TileMobTrap) {
-      var caps = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+    if (!level.isClientSide && blockEntity instanceof TileMobTrap) {
+      IItemHandler caps = level.getCapability(Capabilities.ItemHandler.BLOCK, pos, null);
       if (caps == null) {
         return;
       }
@@ -93,12 +89,11 @@ public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBl
       if (dyeFound.isEmpty()) {
         return;
       }
-      for (TrapRecipe recipe : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.TRAP_RECIPE.get())) {
+      for (RecipeHolder<TrapRecipe> holder : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.TRAP_RECIPE.get())) {
+        TrapRecipe recipe = holder.value();
         if (recipe.matches(level, dyeFound, entity)) {
           VeinCreeperMod.LOGGER.info(dyeFound + "Found  match " + entity + " vs recipe" + recipe.toString());
-          //give result
-          recipe.spawnEntityResult((ServerLevel) level, pos, entity); //pay cost 
-          //          dyeFound.shrink(1);
+          recipe.spawnEntityResult((ServerLevel) level, pos, entity);
           caps.extractItem(0, 1, false);
           if (caps.getStackInSlot(0).isEmpty()) {
             level.markAndNotifyBlock(pos, level.getChunkAt(pos), state, state, UPDATE_ALL_IMMEDIATE, UPDATE_ALL);
@@ -168,13 +163,12 @@ public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBl
     builder.add(HORIZONTAL_FACING).add(ATTACH_FACE).add(WATERLOGGED);
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
     if (state.getBlock() != newState.getBlock()) {
       BlockEntity tileentity = worldIn.getBlockEntity(pos);
-      if (tileentity instanceof TileMobTrap grinder) {
-        var cap = tileentity.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+      if (tileentity instanceof TileMobTrap trap) {
+        IItemHandler cap = trap.getInventory();
         for (int i = 0; i < cap.getSlots(); ++i) {
           Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), cap.getStackInSlot(i));
         }

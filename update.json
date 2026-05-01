@@ -11,5 +11,8 @@
   	,"1.1.0":"New creeper texture (without the regular mobs green tint) by Marioluigi7896 "
   	,"1.2.0":"New JEI plugin to show recipes and render the creeper"
   	,"1.2.1":"Register vein creepers as type MONSTER instead of MISC fixes #2"
+  },
+  "1.21.1": {
+    "1.2.1":""
   }
 }
