@@ -1,21 +1,19 @@
 package com.lothrazar.veincreeper.entity;
 
 import com.lothrazar.library.util.SoundUtil;
-import com.lothrazar.veincreeper.conf.CreeperConfigManager;
-import com.lothrazar.veincreeper.conf.VeinCreeperType;
+import com.lothrazar.veincreeper.config.VeinCreeperData;
+import com.lothrazar.veincreeper.config.VeinCreeperType;
 import com.lothrazar.veincreeper.explosion.ExplosionOres;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.level.Explosion;
-import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.ForgeEventFactory;
+import net.neoforged.neoforge.event.EventHooks;
 
 public class VeinCreeper extends Creeper {
 
@@ -23,7 +21,7 @@ public class VeinCreeper extends Creeper {
 
   public VeinCreeper(EntityType<VeinCreeper> t, Level level) {
     super(t, level);
-    this.creeperType = CreeperConfigManager.getCreepType(t);
+    this.creeperType = VeinCreeperData.getCreepType(t);
   }
 
   @Override
@@ -44,14 +42,14 @@ public class VeinCreeper extends Creeper {
     this.dead = true;
     var bi = level.getGameRules().getBoolean(GameRules.RULE_MOB_EXPLOSION_DROP_DECAY) ? Explosion.BlockInteraction.DESTROY_WITH_DECAY : Explosion.BlockInteraction.DESTROY;
     // instead of this.level().explode(this,...) we instead create our own custom explosion
-    ExplosionOres explosion = new ExplosionOres(this.level(), this, (DamageSource) null, (ExplosionDamageCalculator) null, this.getX(), this.getY(), this.getZ(), radius, fire, bi);
-    if (!ForgeEventFactory.onExplosionStart(this.level(), explosion)) { // returns true if expl cancelled
+    ExplosionOres explosion = new ExplosionOres(this.level(), this,  this.getX(), this.getY(), this.getZ(), radius, fire, bi);
+    if (!EventHooks.onExplosionStart(this.level(), explosion)) { // returns true if expl cancelled
       explosion.explode();
       explosion.finalizeExplosion(false);
       level.addParticle(ParticleTypes.EXPLOSION_EMITTER, explosion.x(), explosion.y(), explosion.z(), 1.0D, 0.0D, 0.0D);
       //sound
       if (!this.level().isClientSide && this.level() instanceof ServerLevel sl) { // redundant check?
-        SoundUtil.playSoundFromServer(sl, this.blockPosition(), SoundEvents.GENERIC_EXPLODE);
+        SoundUtil.playSoundFromServer(sl, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value());
       }
     }
     //end of level.explode mirror
