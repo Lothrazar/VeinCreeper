@@ -2,7 +2,6 @@ package com.lothrazar.veincreeper;
 
 import com.lothrazar.veincreeper.block.BlockMobTrap;
 import com.lothrazar.veincreeper.block.TileMobTrap;
-import com.lothrazar.veincreeper.config.CreeperConfigManager;
 import com.lothrazar.veincreeper.config.VeinCreeperData;
 import com.lothrazar.veincreeper.config.VeinCreeperType;
 import com.lothrazar.veincreeper.entity.VeinCreeper;

@@ -2,12 +2,10 @@ package com.lothrazar.veincreeper;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.lothrazar.veincreeper.config.CreeperConfigManager;
 import com.lothrazar.veincreeper.event.TrapCreeperEvents;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(VeinCreeperMod.MODID)
