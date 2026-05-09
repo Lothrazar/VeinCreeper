@@ -18,12 +18,12 @@ import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 
 public class VeinCreeperData {
 
-  public static final String JSON_FILENAME = "config/veincreeper/veincreeper.json";
+  public static final String JSON_FILENAME = "config/" + VeinCreeperMod.MODID + ".json";
   public static Map<String, VeinCreeperType> CREEPERS = null;
   public static final ArrayList<DeferredSpawnEggItem> EGGIES = new ArrayList<>();
 
   public static List<VeinCreeperDTO> getEntityJsonOrDefault() {
-    VeinCreeperMod.LOGGER.info("[VeinCreeperMod] Loading veincreeper.json ...");
+    VeinCreeperMod.LOGGER.info("[VeinCreeperMod] Loading  " + JSON_FILENAME);
 
     Path configPath = FMLPaths.GAMEDIR.get().resolve(JSON_FILENAME);
     if (!Files.exists(configPath)) {
@@ -50,6 +50,7 @@ public class VeinCreeperData {
   }
 
   private static void writeDefaultFile(Path configPath) {
+    // hardcoded defaults in /resources/ packaged with jar
     try (var in = VeinCreeperData.class.getResourceAsStream("/veincreeper.defaults.json")) {
       if (in == null) {
         VeinCreeperMod.LOGGER.error("veincreeper.defaults.json not found in JAR");

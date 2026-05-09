@@ -7,8 +7,8 @@
       "displayName": "Coal",
       "dropsExp": true,
       "destructive": false,
-      "radius": 2.2,
-      "fire": false,
+      "radius": 3,
+      "fire": true,
       "spawnEgg": true
     },
     {
@@ -27,7 +27,7 @@
       "displayName": "Diamond",
       "dropsExp": true,
       "destructive": false,
-      "radius": 2.2,
+      "radius": 2,
       "fire": false,
       "spawnEgg": true
     },
@@ -57,7 +57,7 @@
       "displayName": "Redstone",
       "dropsExp": false,
       "destructive": false,
-      "radius": 2.5,
+      "radius": 3,
       "fire": false,
       "spawnEgg": true
     },
@@ -88,7 +88,7 @@
       "dropsExp": true,
       "destructive": true,
       "radius": 2.5,
-      "fire": false,
+      "fire": true,
       "spawnEgg": true
     },
     {
@@ -98,7 +98,7 @@
       "dropsExp": true,
       "destructive": false,
       "radius": 3.0,
-      "fire": false,
+      "fire": true,
       "spawnEgg": true
     }
   ]
