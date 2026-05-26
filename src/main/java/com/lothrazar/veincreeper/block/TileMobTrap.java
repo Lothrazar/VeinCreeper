@@ -1,14 +1,14 @@
 package com.lothrazar.veincreeper.block;
 
-import com.lothrazar.library.entity.BlockEntityFlib;
 import com.lothrazar.veincreeper.CreeperRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-public class TileMobTrap extends BlockEntityFlib {
+public class TileMobTrap extends BlockEntity {
 
   public static final String NBTINV = "inv";
   private final ItemStackHandler inventory = new ItemStackHandler(1);
@@ -32,12 +32,16 @@ public class TileMobTrap extends BlockEntityFlib {
     super.saveAdditional(tag, provider);
     tag.put(NBTINV, inventory.serializeNBT(provider));
   }
-
   @Override
-  public int getField(int k) {
-    return 0;
+  public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    CompoundTag syncData = super.getUpdateTag(registries);
+    this.saveAdditional(syncData, registries);
+    return syncData;
   }
 
   @Override
-  public void setField(int k, int val) {}
+  public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+    this.loadAdditional(tag, registries);
+  }
+
 }
