@@ -11,8 +11,8 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.level.Explosion;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.neoforged.neoforge.event.EventHooks;
 
 public class VeinCreeper extends Creeper {
@@ -36,21 +36,20 @@ public class VeinCreeper extends Creeper {
 
   @Override
   public void explodeCreeper() {
-    var level = this.level();
+    if (!(this.level() instanceof ServerLevel level)) {
+      return;
+    }
     final float radius = creeperType.getRadius();
     final boolean fire = creeperType.doesFire();
     this.dead = true;
-    var bi = level.getGameRules().getBoolean(GameRules.RULE_MOB_EXPLOSION_DROP_DECAY) ? Explosion.BlockInteraction.DESTROY_WITH_DECAY : Explosion.BlockInteraction.DESTROY;
+    var bi = level.getGameRules().get(GameRules.MOB_EXPLOSION_DROP_DECAY) ? Explosion.BlockInteraction.DESTROY_WITH_DECAY : Explosion.BlockInteraction.DESTROY;
     // instead of this.level().explode(this,...) we instead create our own custom explosion
-    ExplosionOres explosion = new ExplosionOres(this.level(), this,  this.getX(), this.getY(), this.getZ(), radius, fire, bi);
-    if (!EventHooks.onExplosionStart(this.level(), explosion)) { // returns true if expl cancelled
+    ExplosionOres explosion = new ExplosionOres(level, this, this.getX(), this.getY(), this.getZ(), radius, fire, bi);
+    if (!EventHooks.onExplosionStart(level, explosion)) { // returns true if expl cancelled
       explosion.explode();
-      explosion.finalizeExplosion(false);
       level.addParticle(ParticleTypes.EXPLOSION_EMITTER, explosion.x(), explosion.y(), explosion.z(), 1.0D, 0.0D, 0.0D);
       //sound
-      if (!this.level().isClientSide && this.level() instanceof ServerLevel sl) { // redundant check?
-        SoundUtil.playSoundFromServer(sl, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value());
-      }
+      SoundUtil.playSoundFromServer(level, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value());
     }
     //end of level.explode mirror
     this.discard();

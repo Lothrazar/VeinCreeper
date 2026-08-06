@@ -12,20 +12,20 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class TrapCatalyst implements IRecipeCategory<TrapRecipe> {
 
-  public static final ResourceLocation ID = CreeperRegistry.TRAP_RECIPE.getId();
+  public static final Identifier ID = CreeperRegistry.TRAP_RECIPE.getId();
   static final RecipeType<TrapRecipe> TYPE = new RecipeType<>(ID, TrapRecipe.class);
   private IDrawable gui;
   private IDrawable icon;
 
   public TrapCatalyst(IGuiHelper helper) {
-    gui = helper.drawableBuilder(ResourceLocation.fromNamespaceAndPath(VeinCreeperMod.MODID, "textures/gui/jei_trap.png"), 0, 0, 169, 69).setTextureSize(169, 69).build();
-    icon = helper.drawableBuilder(ResourceLocation.fromNamespaceAndPath(VeinCreeperMod.MODID, "textures/block/trap.png"), 0, 0, 16, 16).setTextureSize(16, 16).build();
+    gui = helper.drawableBuilder(Identifier.fromNamespaceAndPath(VeinCreeperMod.MODID, "textures/gui/jei_trap.png"), 0, 0, 169, 69).setTextureSize(169, 69).build();
+    icon = helper.drawableBuilder(Identifier.fromNamespaceAndPath(VeinCreeperMod.MODID, "textures/block/trap.png"), 0, 0, 16, 16).setTextureSize(16, 16).build();
   }
 
   @Override
@@ -33,10 +33,14 @@ public class TrapCatalyst implements IRecipeCategory<TrapRecipe> {
     return icon;
   }
 
-  @SuppressWarnings("removal")
   @Override
-  public IDrawable getBackground() {
-    return gui;
+  public int getWidth() {
+    return 169;
+  }
+
+  @Override
+  public int getHeight() {
+    return 69;
   }
 
   @Override
@@ -45,11 +49,12 @@ public class TrapCatalyst implements IRecipeCategory<TrapRecipe> {
   }
 
   @Override
-  public void draw(TrapRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics ms, double mouseX, double mouseY) {
+  public void draw(TrapRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor ms, double mouseX, double mouseY) {
+    gui.draw(ms, 0, 0);
     var font = Minecraft.getInstance().font;
     final int FONT = 14210752;
-    ms.drawString(font, recipe.inputEntity.getEntityId() + " ", 0, 2, FONT);
-    ms.drawString(font, recipe.outputEntity.getEntityId() + " ", 0, 60, FONT);
+    ms.text(font, recipe.inputEntity.getEntityId() + " ", 0, 2, FONT);
+    ms.text(font, recipe.outputEntity.getEntityId() + " ", 0, 60, FONT);
   }
 
   @Override

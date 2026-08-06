@@ -6,18 +6,20 @@ import com.lothrazar.veincreeper.VeinCreeperMod;
 import com.lothrazar.veincreeper.config.VeinCreeperData;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeBookCategories;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -27,12 +29,16 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class ExplosionRecipe implements Recipe<RecipeInput> {
 
+  // not a real craftable recipe (matches() always false, consumed via custom explosion-block-drop logic
+  // instead), so the recipe-book-facing methods below are all no-ops/defaults.
+  public static final RecipeSerializer<ExplosionRecipe> SERIALIZER = new RecipeSerializer<>(SerializePartyRecipe.CODEC, SerializePartyRecipe.STREAM_CODEC);
+
   private TagKey<Block> replace = BlockTags.STONE_ORE_REPLACEABLES;
   private BlockIngredient oreOutput = null;
   private EntityIngredient entityType;
   private BlockIngredient bonus = null;
 
-  public ExplosionRecipe(ResourceLocation entityType,
+  public ExplosionRecipe(Identifier entityType,
       TagKey<Block> blockReplace,
       Block result,
       Block bonus, Integer chance) {
@@ -43,7 +49,7 @@ public class ExplosionRecipe implements Recipe<RecipeInput> {
     this.bonus = new BlockIngredient(bonus, chance);
   }
 
-  public ExplosionRecipe(ResourceLocation entityType, TagKey<Block> input, Block result) {
+  public ExplosionRecipe(Identifier entityType, TagKey<Block> input, Block result) {
     this(entityType, input, result, null, null);
   }
 
@@ -57,17 +63,7 @@ public class ExplosionRecipe implements Recipe<RecipeInput> {
   }
 
   @Override
-  public ItemStack assemble(RecipeInput c, HolderLookup.Provider provider) {
-    return getResultItem(provider);
-  }
-
-  @Override
-  public boolean canCraftInDimensions(int x, int y) {
-    return true;
-  }
-
-  @Override
-  public ItemStack getResultItem(HolderLookup.Provider provider) {
+  public ItemStack assemble(RecipeInput c) {
     return getResultItem();
   }
 
@@ -76,12 +72,32 @@ public class ExplosionRecipe implements Recipe<RecipeInput> {
   }
 
   @Override
-  public RecipeType<?> getType() {
+  public boolean showNotification() {
+    return false;
+  }
+
+  @Override
+  public String group() {
+    return "";
+  }
+
+  @Override
+  public PlacementInfo placementInfo() {
+    return PlacementInfo.NOT_PLACEABLE;
+  }
+
+  @Override
+  public RecipeBookCategory recipeBookCategory() {
+    return RecipeBookCategories.CRAFTING_MISC;
+  }
+
+  @Override
+  public RecipeType<ExplosionRecipe> getType() {
     return CreeperRegistry.EXPLOSION_RECIPE.get();
   }
 
   @Override
-  public RecipeSerializer<?> getSerializer() {
+  public RecipeSerializer<ExplosionRecipe> getSerializer() {
     return CreeperRegistry.R_SERIALIZER.get();
   }
 
@@ -107,39 +123,27 @@ public class ExplosionRecipe implements Recipe<RecipeInput> {
         TagKey.codec(Registries.BLOCK).fieldOf("tag").forGetter(TargetData::tag)).apply(inst, TargetData::new));
   }
 
-  public static class SerializePartyRecipe implements RecipeSerializer<ExplosionRecipe> {
+  private static class SerializePartyRecipe {
 
-    public static final MapCodec<ExplosionRecipe> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
+    static final MapCodec<ExplosionRecipe> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
         com.mojang.serialization.Codec.STRING.fieldOf("veincreeper").forGetter(r -> r.entityType.getEntityId().getPath()),
         TargetData.CODEC.fieldOf("target").forGetter(r -> new TargetData(r.replace)),
         OreData.CODEC.fieldOf("ore").forGetter(r -> new OreData(
             r.oreOutput.getBlock(),
             (r.bonus != null && r.bonus.getBlock() != null) ? Optional.of(r.bonus.getBlock()) : Optional.empty(),
             (r.bonus != null && r.bonus.getChance() != null) ? Optional.of(r.bonus.getChance()) : Optional.empty()))).apply(inst, (creeperId, target, ore) -> {
-              ResourceLocation entity = ResourceLocation.fromNamespaceAndPath(VeinCreeperMod.MODID, creeperId);
+              Identifier entity = Identifier.fromNamespaceAndPath(VeinCreeperMod.MODID, creeperId);
               VeinCreeperMod.LOGGER.debug("loading explosion recipe for " + entity);
               if (ore.bonus().isPresent() && ore.bonusChance().isPresent()) {
                 return new ExplosionRecipe(entity, target.tag(), ore.ore(), ore.bonus().get(), ore.bonusChance().get());
               }
               return new ExplosionRecipe(entity, target.tag(), ore.ore());
             }));
-    public static final StreamCodec<RegistryFriendlyByteBuf, ExplosionRecipe> STREAM_CODEC = StreamCodec.composite(
-        ResourceLocation.STREAM_CODEC, r -> r.entityType.getEntityId(),
-        ResourceLocation.STREAM_CODEC, r -> r.replace.location(),
+    static final StreamCodec<RegistryFriendlyByteBuf, ExplosionRecipe> STREAM_CODEC = StreamCodec.composite(
+        Identifier.STREAM_CODEC, r -> r.entityType.getEntityId(),
+        Identifier.STREAM_CODEC, r -> r.replace.location(),
         ByteBufCodecs.registry(Registries.BLOCK), r -> r.oreOutput.getBlock(),
         (entityId, tagLoc, block) -> new ExplosionRecipe(entityId, TagKey.create(Registries.BLOCK, tagLoc), block));
-
-    public SerializePartyRecipe() {}
-
-    @Override
-    public MapCodec<ExplosionRecipe> codec() {
-      return CODEC;
-    }
-
-    @Override
-    public StreamCodec<RegistryFriendlyByteBuf, ExplosionRecipe> streamCodec() {
-      return STREAM_CODEC;
-    }
   }
 
   public boolean matches(Entity exploder, BlockState blockstate) {
@@ -149,7 +153,7 @@ public class ExplosionRecipe implements Recipe<RecipeInput> {
     return match;
   }
 
-  public ResourceLocation getEntityType() {
+  public Identifier getEntityType() {
     return this.entityType.getEntityId();
   }
 

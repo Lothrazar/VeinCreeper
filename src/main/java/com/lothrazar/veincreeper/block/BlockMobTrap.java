@@ -8,14 +8,14 @@ import com.lothrazar.veincreeper.recipe.TrapRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Containers;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -26,7 +26,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
@@ -38,7 +37,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBlock {
 
   public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-  public static final DirectionProperty HORIZONTAL_FACING = BlockStateProperties.HORIZONTAL_FACING;
+  public static final EnumProperty<Direction> HORIZONTAL_FACING = BlockStateProperties.HORIZONTAL_FACING;
   public static final EnumProperty<AttachFace> ATTACH_FACE = BlockStateProperties.ATTACH_FACE;
   protected static final VoxelShape AABB_CEILING_X = Block.box(0.0D, 14.0D, 0.0D, 16.0D, 16.0D, 16.0D);
   protected static final VoxelShape AABB_CEILING_Z = Block.box(5.0D, 14.0D, 6.0D, 11.0D, 16.0D, 10.0D);
@@ -72,7 +71,7 @@ public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBl
   };
 
   @Override
-  public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+  public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
     if (sneakPlayerAvoid && entity instanceof Player && ((Player) entity).isCrouching()) {
       return;
     }
@@ -80,8 +79,8 @@ public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBl
       return;
     }
     BlockEntity blockEntity = level.getBlockEntity(pos);
-    if (!level.isClientSide && blockEntity instanceof TileMobTrap) {
-      IItemHandler caps = level.getCapability(Capabilities.ItemHandler.BLOCK, pos, null);
+    if (!level.isClientSide() && blockEntity instanceof TileMobTrap) {
+      IItemHandler caps = getItemHandler(level, pos);
       if (caps == null) {
         return;
       }
@@ -89,7 +88,7 @@ public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBl
       if (dyeFound.isEmpty()) {
         return;
       }
-      for (RecipeHolder<TrapRecipe> holder : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.TRAP_RECIPE.get())) {
+      for (RecipeHolder<TrapRecipe> holder : ((ServerLevel) level).recipeAccess().recipeMap().byType(CreeperRegistry.TRAP_RECIPE.get())) {
         TrapRecipe recipe = holder.value();
         if (recipe.matches(level, dyeFound, entity)) {
           VeinCreeperMod.LOGGER.info(dyeFound + "Found  match " + entity + " vs recipe" + recipe.toString());
@@ -101,6 +100,13 @@ public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBl
         }
       }
     }
+  }
+
+  // Capabilities.Item.BLOCK now resolves to the transactional ResourceHandler<ItemResource> API;
+  // bridges back to IItemHandler via the built-in first-party adapter.
+  public static IItemHandler getItemHandler(Level level, BlockPos pos) {
+    var handler = level.getCapability(Capabilities.Item.BLOCK, pos, null);
+    return handler == null ? null : IItemHandler.of(handler);
   }
 
   @Override
@@ -153,7 +159,7 @@ public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBl
   }
 
   @Override
-  public boolean shouldDisplayFluidOverlay(BlockState state, BlockAndTintGetter world, BlockPos pos, FluidState fluidState) {
+  public boolean shouldDisplayFluidOverlay(BlockState state, BlockAndLightGetter world, BlockPos pos, FluidState fluidState) {
     return true;
   }
 
@@ -163,18 +169,11 @@ public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBl
     builder.add(HORIZONTAL_FACING).add(ATTACH_FACE).add(WATERLOGGED);
   }
 
+  // dropping the inventory contents now happens in TileMobTrap#preRemoveSideEffects (BlockEntity's own
+  // default only auto-drops for BlockEntities implementing Container, which this one doesn't).
+  // Only the comparator update still needs a manual hook here, via this replacement for onRemove.
   @Override
-  public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-    if (state.getBlock() != newState.getBlock()) {
-      BlockEntity tileentity = worldIn.getBlockEntity(pos);
-      if (tileentity instanceof TileMobTrap trap) {
-        IItemHandler cap = trap.getInventory();
-        for (int i = 0; i < cap.getSlots(); ++i) {
-          Containers.dropItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), cap.getStackInSlot(i));
-        }
-        worldIn.updateNeighbourForOutputSignal(pos, this);
-      }
-      super.onRemove(state, worldIn, pos, newState, isMoving);
-    }
+  protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+    level.updateNeighbourForOutputSignal(pos, this);
   }
 }

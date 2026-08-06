@@ -1,0 +1,10 @@
+{
+    "model": {
+        "type": "minecraft:model",
+        "model": "veincreeper:item/spawn_egg_emerald_creeper",
+        "tints": [
+            { "type": "veincreeper:creeper_egg", "layer": 0 },
+            { "type": "veincreeper:creeper_egg", "layer": 1 }
+        ]
+    }
+}

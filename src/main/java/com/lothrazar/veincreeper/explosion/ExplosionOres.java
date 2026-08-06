@@ -1,46 +1,38 @@
 package com.lothrazar.veincreeper.explosion;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
 import com.lothrazar.veincreeper.config.VeinCreeperData;
 import com.lothrazar.veincreeper.recipe.ExplosionRecipe;
-import com.mojang.datafixers.util.Pair;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Explosion;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseFireBlock;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
-public class ExplosionOres extends Explosion {
+// Explosion is an interface now; the real block-selection + per-block-destroy algorithm lives on
+// ServerExplosion, which we extend directly. Its block-selection algorithm (calculateExplodedPositions)
+// and entity-damage pass (hurtEntities) are reused unmodified from the vanilla explode() call - only
+// interactWithBlocks (the per-block ore-replace-vs-vanilla-destroy dispatch) is overridden, via an
+// access transformer widening it from private to protected (see accesstransformer.cfg).
+public class ExplosionOres extends ServerExplosion {
 
-  private final RandomSource random = RandomSource.create();
-  private final Level level;
-  private final boolean fire;
-  private final float radius;
   private final double x;
   private final double y;
-   private final double z;
-// old     super(level, entity, src, calc, x, y, z, radius, f, bi);
-  public ExplosionOres(Level level, Entity source, double x, double y, double z, float radius, boolean fire, Explosion.BlockInteraction bi) {
-    super(level, source, x, y, z, radius, fire, bi);
-    this.level = level;
-    this.radius = radius;
+  private final double z;
+
+  public ExplosionOres(ServerLevel level, Entity source, double x, double y, double z, float radius, boolean fire, Explosion.BlockInteraction bi) {
+    super(level, source, null, null, new Vec3(x, y, z), radius, fire, bi);
     this.x = x;
     this.y = y;
     this.z = z;
-    this.fire = fire;
   }
 
   public double x() {
@@ -56,87 +48,50 @@ public class ExplosionOres extends Explosion {
   }
 
   @Override
-  public void finalizeExplosion(boolean p_46076_) {
-    boolean flag = this.interactsWithBlocks();
-    if (p_46076_) {
-      if (!(this.radius < 2.0F) && flag) {
-        this.level.addParticle(ParticleTypes.EXPLOSION_EMITTER, this.x, this.y, this.z, 1.0D, 0.0D, 0.0D);
-      }
-      else {
-        this.level.addParticle(ParticleTypes.EXPLOSION, this.x, this.y, this.z, 1.0D, 0.0D, 0.0D);
-      }
+  protected void interactWithBlocks(List<BlockPos> targetBlocks) {
+    ServerLevel level = this.level();
+    Entity exploder = this.getDirectSourceEntity();
+    final String key = VeinCreeperData.getKeyFromEntity(exploder);
+    if (!VeinCreeperData.CREEPERS.containsKey(key)) {
+      VeinCreeperMod.LOGGER.error("Missing type from explosion " + key);
+      return;
     }
-    Map<BlockPos, BlockState> toReplace = new HashMap<>();
-    if (flag) {
-      ObjectArrayList<Pair<ItemStack, BlockPos>> objectarraylist = new ObjectArrayList<>();
-      Util.shuffle(this.toBlow, this.level.random);
-      for (BlockPos blockpos : this.toBlow) {
-        BlockState blockstate = this.level.getBlockState(blockpos);
-        if (!blockstate.isAir()) {
-          BlockPos blockpos1 = blockpos.immutable();
-          //overrides
-          final String key = VeinCreeperData.getKeyFromEntity(this.getDirectSourceEntity());
-          if (!VeinCreeperData.CREEPERS.containsKey(key)) {
-            VeinCreeperMod.LOGGER.error("Missing type from explosion " + key);
-            return;
-          }
-          var type = VeinCreeperData.CREEPERS.get(key);
-          //itsa valid entity, so NOW check recipe
-          boolean recipeFound = false;
-          for (RecipeHolder<ExplosionRecipe> holder : level.getRecipeManager().getAllRecipesFor(CreeperRegistry.EXPLOSION_RECIPE.get())) {
-            ExplosionRecipe recipe = holder.value();
-            if (!recipe.matches(this.getDirectSourceEntity(), blockstate)) {
-              continue;
-            }
-            recipeFound = true;
-            if (recipe.hasBonus()
-                && (recipe.getBonus().getChance() / 100F) > level.random.nextDouble()) {
-              toReplace.put(blockpos1, recipe.getBonus().getBlock().defaultBlockState());
-              VeinCreeperMod.LOGGER.debug("Explosion recipe applied BONUS " + holder.id() +" at " + blockpos1);
-            }
-            else {
-              toReplace.put(blockpos1, recipe.getOre().getBlock().defaultBlockState());
-              VeinCreeperMod.LOGGER.debug("Explosion recipe applied to world " + holder.id() +" at " + blockpos1);
-            }
-            break;
-          }
-          if (!recipeFound && type.isDestructive()) {
-            if (this.level instanceof ServerLevel serverlevel) {
-              blockstate.onExplosionHit(serverlevel, blockpos, this, (drop, dropPos) -> {
-                addBlockDropsLocal(objectarraylist, drop, dropPos);
-              });
-            }
-          }
-        }
-      }
-      for (Pair<ItemStack, BlockPos> pair : objectarraylist) {
-        Block.popResource(this.level, pair.getSecond(), pair.getFirst());
-      }
-    }
-    if (this.fire) {
-      for (BlockPos blockpos2 : this.toBlow) {
-        if (this.random.nextInt(3) == 0 && this.level.getBlockState(blockpos2).isAir() && this.level.getBlockState(blockpos2.below()).isSolidRender(this.level, blockpos2.below())) {
-          this.level.setBlockAndUpdate(blockpos2, BaseFireBlock.getState(this.level, blockpos2));
-        }
-      }
-    }
-    for (BlockPos rep : toReplace.keySet()) {
-      this.level.setBlockAndUpdate(rep, toReplace.get(rep));
-    }
-  }
+    var type = VeinCreeperData.CREEPERS.get(key);
 
-  private static void addBlockDropsLocal(ObjectArrayList<Pair<ItemStack, BlockPos>> drops, ItemStack stack, BlockPos pos) {
-    for (int i = 0; i < drops.size(); i++) {
-      Pair<ItemStack, BlockPos> pair = drops.get(i);
-      ItemStack existing = pair.getFirst();
-      if (ItemEntity.areMergable(existing, stack)) {
-        ItemStack merged = ItemEntity.merge(existing, stack, 16);
-        drops.set(i, Pair.of(merged, pair.getSecond()));
-        if (stack.isEmpty()) {
-          return;
+    Map<BlockPos, BlockState> toReplace = new HashMap<>();
+    List<BlockPos> vanillaBlocks = new ArrayList<>();
+    for (BlockPos blockpos : targetBlocks) {
+      BlockState blockstate = level.getBlockState(blockpos);
+      if (blockstate.isAir()) {
+        continue;
+      }
+      BlockPos blockpos1 = blockpos.immutable();
+      boolean recipeFound = false;
+      for (RecipeHolder<ExplosionRecipe> holder : level.recipeAccess().recipeMap().byType(CreeperRegistry.EXPLOSION_RECIPE.get())) {
+        ExplosionRecipe recipe = holder.value();
+        if (!recipe.matches(exploder, blockstate)) {
+          continue;
         }
+        recipeFound = true;
+        if (recipe.hasBonus() && (recipe.getBonus().getChance() / 100F) > level.getRandom().nextDouble()) {
+          toReplace.put(blockpos1, recipe.getBonus().getBlock().defaultBlockState());
+          VeinCreeperMod.LOGGER.debug("Explosion recipe applied BONUS " + holder.id() + " at " + blockpos1);
+        }
+        else {
+          toReplace.put(blockpos1, recipe.getOre().getBlock().defaultBlockState());
+          VeinCreeperMod.LOGGER.debug("Explosion recipe applied to world " + holder.id() + " at " + blockpos1);
+        }
+        break;
+      }
+      if (!recipeFound && type.isDestructive()) {
+        vanillaBlocks.add(blockpos);
       }
     }
-    drops.add(Pair.of(stack, pos));
+    if (!vanillaBlocks.isEmpty()) {
+      super.interactWithBlocks(vanillaBlocks);
+    }
+    for (var entry : toReplace.entrySet()) {
+      level.setBlockAndUpdate(entry.getKey(), entry.getValue());
+    }
   }
 }

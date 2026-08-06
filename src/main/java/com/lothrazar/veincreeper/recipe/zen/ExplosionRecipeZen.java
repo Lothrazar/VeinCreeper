@@ -11,7 +11,7 @@ import com.lothrazar.veincreeper.VeinCreeperMod;
 import com.lothrazar.veincreeper.recipe.ExplosionRecipe;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -29,11 +29,11 @@ public class ExplosionRecipeZen implements IRecipeManager<ExplosionRecipe> {
   @ZenCodeType.Method
   public void addRecipe(String name, String blockTagTarget, String blockResult, String entityType) {
     name = fixRecipeName(name);
-    TagKey<Block> targetMe = TagKey.create(Registries.BLOCK, ResourceLocation.parse(blockTagTarget));
-    Block ore = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(blockResult));
-    ExplosionRecipe m = new ExplosionRecipe(ResourceLocation.parse(entityType),
+    TagKey<Block> targetMe = TagKey.create(Registries.BLOCK, Identifier.parse(blockTagTarget));
+    Block ore = BuiltInRegistries.BLOCK.get(Identifier.parse(blockResult));
+    ExplosionRecipe m = new ExplosionRecipe(Identifier.parse(entityType),
         targetMe, ore);
-    ResourceLocation id = ResourceLocation.fromNamespaceAndPath(CraftTweakerConstants.MOD_ID, name);
+    Identifier id = Identifier.fromNamespaceAndPath(CraftTweakerConstants.MOD_ID, name);
     CraftTweakerAPI.apply(new ActionAddRecipe<>(this, new RecipeHolder<>(id, m)));
     VeinCreeperMod.LOGGER.debug("zs explosion: Recipe loaded " + id);
   }
@@ -41,12 +41,12 @@ public class ExplosionRecipeZen implements IRecipeManager<ExplosionRecipe> {
   @ZenCodeType.Method
   public void addRecipe(String name, String blockTagTarget, String blockResult, String entityType, String bonusId, Integer chance) {
     name = fixRecipeName(name);
-    TagKey<Block> targetMe = TagKey.create(Registries.BLOCK, ResourceLocation.parse(blockTagTarget));
-    Block ore = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(blockResult));
-    Block bonus = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(bonusId));
-    ExplosionRecipe m = new ExplosionRecipe(ResourceLocation.parse(entityType),
+    TagKey<Block> targetMe = TagKey.create(Registries.BLOCK, Identifier.parse(blockTagTarget));
+    Block ore = BuiltInRegistries.BLOCK.get(Identifier.parse(blockResult));
+    Block bonus = BuiltInRegistries.BLOCK.get(Identifier.parse(bonusId));
+    ExplosionRecipe m = new ExplosionRecipe(Identifier.parse(entityType),
         targetMe, ore, bonus, chance);
-    ResourceLocation id = ResourceLocation.fromNamespaceAndPath(CraftTweakerConstants.MOD_ID, name);
+    Identifier id = Identifier.fromNamespaceAndPath(CraftTweakerConstants.MOD_ID, name);
     CraftTweakerAPI.apply(new ActionAddRecipe<>(this, new RecipeHolder<>(id, m)));
     VeinCreeperMod.LOGGER.debug("zs explosion: Recipe loaded " + id);
   }

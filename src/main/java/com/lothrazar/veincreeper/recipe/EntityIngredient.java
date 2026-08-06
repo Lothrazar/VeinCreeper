@@ -2,18 +2,18 @@ package com.lothrazar.veincreeper.recipe;
 
 import java.util.Objects;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class EntityIngredient {
 
-  private ResourceLocation entityId;
+  private Identifier entityId;
   private CompoundTag nbt = new CompoundTag();
 
-  public EntityIngredient(ResourceLocation entityId) {
+  public EntityIngredient(Identifier entityId) {
     this(entityId, null);
   }
 
-  public EntityIngredient(ResourceLocation entityId, CompoundTag nbt) {
+  public EntityIngredient(Identifier entityId, CompoundTag nbt) {
     this.entityId = entityId;
     this.nbt = (nbt == null ? new CompoundTag() : nbt);
   }
@@ -22,11 +22,11 @@ public class EntityIngredient {
     return false; //TODO
   }
 
-  public ResourceLocation getEntityId() {
+  public Identifier getEntityId() {
     return entityId;
   }
 
-  public void setEntityId(ResourceLocation entityId) {
+  public void setEntityId(Identifier entityId) {
     this.entityId = entityId;
   }
 

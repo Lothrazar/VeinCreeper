@@ -1,7 +1,6 @@
 package com.lothrazar.veincreeper.recipe.jei;
 
 import java.util.List;
-import java.util.Objects;
 import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
 import mezz.jei.api.IModPlugin;
@@ -11,17 +10,17 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
 
 @JeiPlugin
 public class PluginJEI implements IModPlugin {
 
-  private static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(VeinCreeperMod.MODID, "jei");
+  private static final Identifier ID = Identifier.fromNamespaceAndPath(VeinCreeperMod.MODID, "jei");
 
   @Override
-  public ResourceLocation getPluginUid() {
+  public Identifier getPluginUid() {
     return ID;
   }
 
@@ -37,10 +36,17 @@ public class PluginJEI implements IModPlugin {
     registry.addRecipeCategories(new TrapCatalyst(guiHelper));
   }
 
+  // Full Recipe objects are no longer synced to the client at all (only recipe-book display data is).
+  // Reading the local integrated server's RecipeManager directly is the only way to get real recipe
+  // instances here; this only works in singleplayer/LAN-hosted worlds, so a JEI-connected dedicated-server
+  // client simply won't see these categories populated.
   @Override
   public void registerRecipes(IRecipeRegistration registry) {
-    ClientLevel world = Objects.requireNonNull(Minecraft.getInstance().level);
-    registry.addRecipes(ExplosionCatalyst.TYPE, List.copyOf(world.getRecipeManager().getAllRecipesFor(CreeperRegistry.EXPLOSION_RECIPE.get()).stream().map(h -> h.value()).toList()));
-    registry.addRecipes(TrapCatalyst.TYPE, List.copyOf(world.getRecipeManager().getAllRecipesFor(CreeperRegistry.TRAP_RECIPE.get()).stream().map(h -> h.value()).toList()));
+    MinecraftServer server = Minecraft.getInstance().getSingleplayerServer();
+    if (server == null) {
+      return;
+    }
+    registry.addRecipes(ExplosionCatalyst.TYPE, List.copyOf(server.getRecipeManager().recipeMap().byType(CreeperRegistry.EXPLOSION_RECIPE.get()).stream().map(h -> h.value()).toList()));
+    registry.addRecipes(TrapCatalyst.TYPE, List.copyOf(server.getRecipeManager().recipeMap().byType(CreeperRegistry.TRAP_RECIPE.get()).stream().map(h -> h.value()).toList()));
   }
 }

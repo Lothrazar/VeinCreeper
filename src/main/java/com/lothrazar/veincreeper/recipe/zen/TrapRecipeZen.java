@@ -10,7 +10,7 @@ import com.blamejared.crafttweaker.api.recipe.manager.base.IRecipeManager;
 import com.lothrazar.veincreeper.CreeperRegistry;
 import com.lothrazar.veincreeper.VeinCreeperMod;
 import com.lothrazar.veincreeper.recipe.TrapRecipe;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 
@@ -27,10 +27,10 @@ public class TrapRecipeZen implements IRecipeManager<TrapRecipe> {
   public void addRecipe(String name, IIngredient input, String entityType, String entityOut) {
     name = fixRecipeName(name);
     TrapRecipe m = new TrapRecipe(input.asVanillaIngredient(),
-        ResourceLocation.parse(entityType),
-        ResourceLocation.parse(entityOut),
+        Identifier.parse(entityType),
+        Identifier.parse(entityOut),
         null, null);
-    ResourceLocation id = ResourceLocation.fromNamespaceAndPath(CraftTweakerConstants.MOD_ID, name);
+    Identifier id = Identifier.fromNamespaceAndPath(CraftTweakerConstants.MOD_ID, name);
     CraftTweakerAPI.apply(new ActionAddRecipe<>(this, new RecipeHolder<>(id, m)));
     VeinCreeperMod.LOGGER.info("zs trap: Recipe loaded " + id);
   }

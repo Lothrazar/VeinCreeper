@@ -1,6 +1,7 @@
 package com.lothrazar.veincreeper.event;
 
 import com.lothrazar.veincreeper.CreeperRegistry;
+import com.lothrazar.veincreeper.block.BlockMobTrap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -8,7 +9,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.items.IItemHandler;
 
@@ -21,10 +21,10 @@ public class TrapCreeperEvents {
     }
     BlockPos pos = event.getPos();
     Player player = event.getEntity();
-    Level level = player.getCommandSenderWorld();
+    Level level = player.level();
     BlockState state = level.getBlockState(pos);
     if (state.getBlock() == CreeperRegistry.TRAP.get()) {
-      IItemHandler caps = level.getCapability(Capabilities.ItemHandler.BLOCK, pos, null);
+      IItemHandler caps = BlockMobTrap.getItemHandler(level, pos);
       if (caps != null) {
         if (event.getItemStack().isEmpty()) {
           var found = caps.extractItem(0, 64, false);

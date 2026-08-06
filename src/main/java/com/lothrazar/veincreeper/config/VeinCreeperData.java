@@ -13,14 +13,14 @@ import com.google.gson.*;
 import com.lothrazar.veincreeper.VeinCreeperMod;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
 import net.neoforged.fml.loading.FMLPaths;
-import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 
 public class VeinCreeperData {
 
   public static final String JSON_FILENAME = "config/" + VeinCreeperMod.MODID + ".json";
   public static Map<String, VeinCreeperType> CREEPERS = null;
-  public static final ArrayList<DeferredSpawnEggItem> EGGIES = new ArrayList<>();
+  public static final ArrayList<Item> EGGIES = new ArrayList<>();
 
   public static List<VeinCreeperDTO> getEntityJsonOrDefault() {
     VeinCreeperMod.LOGGER.info("[VeinCreeperMod] Loading  " + JSON_FILENAME);
