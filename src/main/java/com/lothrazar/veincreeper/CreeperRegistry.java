@@ -45,7 +45,7 @@ public class CreeperRegistry {
   public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, VeinCreeperMod.MODID);
   public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, VeinCreeperMod.MODID);
   public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, VeinCreeperMod.MODID);
-  public static final DeferredHolder<Block, BlockMobTrap> TRAP = BLOCKS.register("trap", () -> new BlockMobTrap(Block.Properties.of()));
+  public static final DeferredHolder<Block, BlockMobTrap> TRAP = BLOCKS.registerBlock("trap", props -> new BlockMobTrap(props));
   public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TileMobTrap>> TRAP_TILE = TILES.register("trap", () -> new BlockEntityType<>(TileMobTrap::new, TRAP.get()));
   public static final DeferredHolder<RecipeType<?>, RecipeType<ExplosionRecipe>> EXPLOSION_RECIPE = RECIPE_TYPES.register("explosion", () -> new RecipeType<ExplosionRecipe>() {});
   public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<ExplosionRecipe>> R_SERIALIZER = RECIPE_SERIALIZERS.register("explosion", () -> ExplosionRecipe.SERIALIZER);
@@ -74,7 +74,9 @@ public class CreeperRegistry {
 
     // register spawn eggs
     event.register(Registries.ITEM, reg -> {
-      reg.register(Identifier.fromNamespaceAndPath(VeinCreeperMod.MODID, "trap"), new BlockItem(TRAP.get(), new Item.Properties().useBlockDescriptionPrefix()));
+      Identifier trapItemId = Identifier.fromNamespaceAndPath(VeinCreeperMod.MODID, "trap");
+      reg.register(trapItemId, new BlockItem(TRAP.get(),
+          new Item.Properties().useBlockDescriptionPrefix().setId(ResourceKey.create(Registries.ITEM, trapItemId))));
 //      CreeperConfigManager.parseConfig();
 //      if (CreeperConfigManager.SPAWN_EGGS.get()) {
         for (VeinCreeperType type : VeinCreeperData.CREEPERS.values()) {
@@ -83,10 +85,12 @@ public class CreeperRegistry {
             continue;
           }
 
+          Identifier eggId = Identifier.fromNamespaceAndPath(VeinCreeperMod.MODID, "spawn_egg_" + type.getId());
           var egg = new VeinCreeperEggItem(
-              new Item.Properties().component(DataComponents.ENTITY_DATA, TypedEntityData.of(type.getEntityType(), new CompoundTag())),
+              new Item.Properties().component(DataComponents.ENTITY_DATA, TypedEntityData.of(type.getEntityType(), new CompoundTag()))
+                  .setId(ResourceKey.create(Registries.ITEM, eggId)),
               type.getDisplayName());
-          reg.register(Identifier.fromNamespaceAndPath(VeinCreeperMod.MODID, "spawn_egg_" + type.getId()), egg);
+          reg.register(eggId, egg);
           VeinCreeperData.EGGIES.add(egg);
         }
 //      }
