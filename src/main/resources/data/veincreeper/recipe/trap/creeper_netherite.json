@@ -1,8 +1,6 @@
 {
 	"type": "veincreeper:trap",
-	"input": {
-		"item": "minecraft:netherite_ingot"
-	},
+	"input": "minecraft:netherite_ingot",
 	"mob": {
 		"entity": "minecraft:creeper",
 		"nbt":{"OnGround":1} 

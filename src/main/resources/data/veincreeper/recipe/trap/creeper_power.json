@@ -1,8 +1,6 @@
 {
 	"type": "veincreeper:trap",
-	"input": {
-		"item": "minecraft:ghast_tear"
-	},
+	"input": "minecraft:ghast_tear",
 	"mob": {
 		"entity": "minecraft:creeper",
 		"nbt":{"powered": false, "OnGround":1} 

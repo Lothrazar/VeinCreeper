@@ -121,6 +121,8 @@ public class TrapRecipe implements Recipe<RecipeInput> {
   public boolean matches(Level level, ItemStack dyeFound, Entity entity) {
     var trapped = BuiltInRegistries.ENTITY_TYPE.getValue(inputEntity.getEntityId());
     boolean matches = (trapped == entity.getType() && this.getInput().test(dyeFound));
+  //  VeinCreeperMod.LOGGER.debug("[trap] check recipe={} trappedType={} entityType={} typeMatch={} itemMatch={}",
+//        inputEntity.getEntityId(), trapped, entity.getType(), trapped == entity.getType(), this.getInput().test(dyeFound));
     if (matches && !this.inputEntity.getNbt().isEmpty()) {
       boolean tagMatch = false;
       TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, level.registryAccess());

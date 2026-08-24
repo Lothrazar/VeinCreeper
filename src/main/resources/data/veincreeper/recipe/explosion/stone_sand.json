@@ -3,7 +3,7 @@
 	"_comment":"veincreepers array. targets array. ore singular. bonus array",
 	"veincreeper": "stone_creeper",
 	"target": {
-		"tag": "forge:sand"
+		"tag": "minecraft:sand"
 	},
 	"ore": {
 		"block": "minecraft:stone",

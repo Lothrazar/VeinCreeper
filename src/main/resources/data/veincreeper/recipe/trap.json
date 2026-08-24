@@ -8,7 +8,7 @@
   "key": {
     "t": "minecraft:tripwire_hook",
     "w": "#minecraft:wooden_pressure_plates",
-    "o": "#forge:obsidian"
+    "o": "#c:obsidians"
   },
   "result": {
     "id": "veincreeper:trap",

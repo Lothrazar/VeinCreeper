@@ -1,8 +1,6 @@
 {
 	"type": "veincreeper:trap",
-	"input": {
-		"item": "minecraft:kelp"
-	},
+	"input": "minecraft:kelp",
 	"mob": {
 		"entity": "minecraft:zombie"
 	},

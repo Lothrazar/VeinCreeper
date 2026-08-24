@@ -65,14 +65,14 @@ public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBl
     return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
   }
 
-  public static final Predicate<Entity> DYE_FINDER = (p) -> {
-    return p.isAlive() && p instanceof ItemEntity
-        && ((ItemEntity) p).getItem().getCount() > 0;
-  };
+//  public static final Predicate<Entity> DYE_FINDER = (p) -> {
+//    return p.isAlive() && p instanceof ItemEntity
+//        && ((ItemEntity) p).getItem().getCount() > 0;
+//  };
 
   @Override
   public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
-    if (sneakPlayerAvoid && entity instanceof Player && ((Player) entity).isCrouching()) {
+    if (sneakPlayerAvoid && entity instanceof Player && entity.isCrouching()) {
       return;
     }
     if (this.requiresRedstoneSignal && !level.hasNeighborSignal(pos)) {
@@ -80,24 +80,32 @@ public class BlockMobTrap extends EntityBlockFlib implements SimpleWaterloggedBl
     }
     BlockEntity blockEntity = level.getBlockEntity(pos);
     if (!level.isClientSide() && blockEntity instanceof TileMobTrap) {
+//      VeinCreeperMod.LOGGER.debug("[trap] entityInside fired: entity={} isPrecise={}", entity, isPrecise);
       IItemHandler caps = getItemHandler(level, pos);
       if (caps == null) {
+//        VeinCreeperMod.LOGGER.debug("[trap] no item capability at {}", pos);
         return;
       }
       ItemStack dyeFound = caps.getStackInSlot(0);
       if (dyeFound.isEmpty()) {
+//        VeinCreeperMod.LOGGER.debug("[trap] slot empty at {}", pos);
         return;
       }
+      boolean anyMatched = false;
       for (RecipeHolder<TrapRecipe> holder : ((ServerLevel) level).recipeAccess().recipeMap().byType(CreeperRegistry.TRAP_RECIPE.get())) {
         TrapRecipe recipe = holder.value();
         if (recipe.matches(level, dyeFound, entity)) {
-          VeinCreeperMod.LOGGER.info(dyeFound + "Found  match " + entity + " vs recipe" + recipe.toString());
+          anyMatched = true;
+//          VeinCreeperMod.LOGGER.debug(dyeFound + "Found  match " + entity + " vs recipe" + recipe.toString());
           recipe.spawnEntityResult((ServerLevel) level, pos, entity);
           caps.extractItem(0, 1, false);
           if (caps.getStackInSlot(0).isEmpty()) {
             level.markAndNotifyBlock(pos, level.getChunkAt(pos), state, state, UPDATE_ALL_IMMEDIATE, UPDATE_ALL);
           }
         }
+      }
+      if (!anyMatched) {
+        VeinCreeperMod.LOGGER.debug("[trap] slotItem={} entity={} matched no trap recipe", dyeFound, entity);
       }
     }
   }

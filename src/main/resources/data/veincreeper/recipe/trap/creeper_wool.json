@@ -1,8 +1,6 @@
 {
 	"type": "veincreeper:trap",
-	"input": {
-		"tag": "minecraft:dampens_vibrations"
-	},
+	"input": "#minecraft:dampens_vibrations",
 	"mob": {
 		"entity": "minecraft:creeper",
 		"nbt":{"ignited": true} 

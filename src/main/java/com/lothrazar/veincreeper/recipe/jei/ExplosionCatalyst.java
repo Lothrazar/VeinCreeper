@@ -66,12 +66,20 @@ public class ExplosionCatalyst implements IRecipeCategory<ExplosionRecipe> {
   public void draw(ExplosionRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor ms, double mouseX, double mouseY) {
     gui.draw(ms, 0, 0);
     var font = Minecraft.getInstance().font;
-    final int FONT = 0xEEEEEE;
+    final int FONT = 0xFFEEEEEE;
     if (recipe.hasBonus()) {
       ms.text(font, recipe.getBonus().getChance() + "%", 148, 46, FONT);
     }
     try {
-      EntityType<?> entityType = EntityType.byString(recipe.getEntityType().toString()).orElse(null);
+      // Look up directly by the recipe's own Identifier instead of round-tripping through
+      // toString()/EntityType.byString() - equivalent, but avoids depending on string parsing
+      // and lets us report exactly which id failed to resolve instead of hitting a bare NPE.
+      Identifier entityId = recipe.getEntityType();
+      EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.getOptional(entityId).orElse(null);
+      if (entityType == null) {
+        VeinCreeperMod.LOGGER.warn("[jei] no entity type registered for id={}, skipping preview render", entityId);
+        return;
+      }
       LivingEntity fakeEntity = (LivingEntity) entityType.create(Minecraft.getInstance().level, EntitySpawnReason.COMMAND);
 //      Quaternionf ANGLE = (new Quaternionf()).rotationXYZ(0.43633232F, 2.1F, (float) Math.PI);
 

@@ -2,7 +2,7 @@
 	"type": "veincreeper:explosion",
 	"veincreeper": "gold_creeper",
 	"target": {
-		"tag": "forge:netherrack"
+		"tag": "veincreeper:netherrack"
 	},
 	"ore": {
 		"block": "minecraft:nether_gold_ore",

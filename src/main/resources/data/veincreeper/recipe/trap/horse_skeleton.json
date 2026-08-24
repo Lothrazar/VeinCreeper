@@ -1,8 +1,6 @@
 {
 	"type": "veincreeper:trap",
-	"input": {
-		"tag": "forge:bones"
-	},
+	"input": "#c:bones",
 	"mob": {
 		"entity": "minecraft:horse",
 		"nbt": {"Tame": false}

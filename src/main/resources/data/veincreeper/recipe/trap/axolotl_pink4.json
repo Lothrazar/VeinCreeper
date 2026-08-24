@@ -1,8 +1,6 @@
 {
 	"type": "veincreeper:trap",
-	"input": {
-		"tag": "c:dyes/pink"
-	},
+	"input": "#c:dyes/pink",
 	"mob": {
 		"entity": "minecraft:axolotl",
 		"nbt":{"Variant":4} 

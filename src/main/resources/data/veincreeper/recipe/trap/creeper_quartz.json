@@ -1,8 +1,6 @@
 {
 	"type": "veincreeper:trap",
-	"input": {
-		"tag": "forge:quartz"
-	},
+	"input": "#c:gems/quartz",
 	"mob": {
 		"entity": "minecraft:creeper",
 		"nbt":{"OnGround":1} 

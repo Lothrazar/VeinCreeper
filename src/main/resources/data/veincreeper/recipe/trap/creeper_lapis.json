@@ -1,8 +1,6 @@
 {
 	"type": "veincreeper:trap",
-	"input": {
-		"item": "minecraft:lapis_lazuli"
-	},
+	"input": "minecraft:lapis_lazuli",
 	"mob": {
 		"entity": "minecraft:creeper",
 		"nbt":{"OnGround":1} 

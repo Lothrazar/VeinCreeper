@@ -1,8 +1,6 @@
 {
 	"type": "veincreeper:trap",
-	"input": {
-		"item": "minecraft:rotten_flesh"
-	},
+	"input": "minecraft:rotten_flesh",
 	"mob": {
 		"entity": "minecraft:horse",
 		"nbt": {"Tame": false}

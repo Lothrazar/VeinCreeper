@@ -1,8 +1,6 @@
 {
 	"type": "veincreeper:trap",
-	"input": {
-		"tag": "c:dyes/purple"
-	},
+	"input": "#c:dyes/purple",
 	"mob": {
 		"entity": "minecraft:creeper",
 		"nbt":{"OnGround":1} 

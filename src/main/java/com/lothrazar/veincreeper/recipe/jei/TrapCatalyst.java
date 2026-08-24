@@ -52,7 +52,7 @@ public class TrapCatalyst implements IRecipeCategory<TrapRecipe> {
   public void draw(TrapRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor ms, double mouseX, double mouseY) {
     gui.draw(ms, 0, 0);
     var font = Minecraft.getInstance().font;
-    final int FONT = 14210752;
+    final int FONT = 0xFF000000 | 14210752;
     ms.text(font, recipe.inputEntity.getEntityId() + " ", 0, 2, FONT);
     ms.text(font, recipe.outputEntity.getEntityId() + " ", 0, 60, FONT);
   }

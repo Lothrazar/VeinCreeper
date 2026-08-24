@@ -1,8 +1,6 @@
 {
 	"type": "veincreeper:trap",
-	"input": {
-		"item": "minecraft:stone"
-	},
+	"input": "minecraft:stone",
 	"mob": {
 		"entity": "minecraft:creeper",
 		"nbt":{"OnGround":1} 

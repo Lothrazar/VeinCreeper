@@ -1,8 +1,6 @@
 {
 	"type": "veincreeper:trap",
-	"input": {
-		"item": "minecraft:gunpowder"
-	},
+	"input": "minecraft:gunpowder",
 	"mob": {
 		"entity": "minecraft:creeper",
 		"nbt":{"ignited": false, "OnGround":1} 
