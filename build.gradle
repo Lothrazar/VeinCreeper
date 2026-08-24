@@ -174,6 +174,8 @@ dependencies {
 
   //these mods have API jars for compile as well as the full mod for local
   compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+  // full jar also needed at compile time to reach mezz.jei.common.Internal for the client-synced RecipeMap
+  compileOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
   localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 
   compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}+${minecraft_version}"

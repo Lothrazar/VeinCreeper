@@ -28,6 +28,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public class ExplosionCatalyst implements IRecipeCategory<ExplosionRecipe> {
@@ -84,10 +85,21 @@ public class ExplosionCatalyst implements IRecipeCategory<ExplosionRecipe> {
 //      Quaternionf ANGLE = (new Quaternionf()).rotationXYZ(0.43633232F, 2.1F, (float) Math.PI);
 
 //      Vector3f vector3f = new Vector3f(0.0F, fakeEntity.getBbHeight() / 2.0F + p_275604_ * fakeEntity.getScale(), 0.0F);
-      int x1=30, y1=64, x2=x1+20, y2=y1+20, scale=20; // TODO: test this
+      // GuiGraphicsExtractor.entity(...) is a "picture-in-picture" render that, unlike
+      // ms.text()/blit() above, ignores the pose-stack translation JEI applies before calling
+      // draw() and takes literal absolute screen pixels. Extract this panel's actual on-screen
+      // origin from the current pose so the box lands inside the recipe layout instead of at the
+      // window's literal top-left corner - that mismatch (plus rendering the player instead of
+      // fakeEntity) is why the creeper used to show up off in a corner. Sized taller than wide
+      // and placed left of the input slot at local (64,29) so a standing creeper isn't clipped.
+      Vector2f origin = ms.pose().transformPosition(new Vector2f(0, 0));
+      int x0 = Math.round(origin.x) + 4, y0 = Math.round(origin.y) + 14;
+      int x1 = x0 + 36, y1 = y0 + 54;
+      float absMouseX = origin.x + (float) mouseX;
+      float absMouseY = origin.y + (float) mouseY;
 
-      InventoryScreen.extractEntityInInventoryFollowsMouse(ms, x1,x2,y1,y2,scale,0.0625F,
-          (float) mouseX, (float) mouseY,Minecraft.getInstance().player);
+      InventoryScreen.extractEntityInInventoryFollowsMouse(ms, x0, y0, x1, y1, 24, 0.0625F,
+          absMouseX, absMouseY, fakeEntity);
 
 
       if (fakeEntity instanceof VeinCreeper creeper) {

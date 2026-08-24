@@ -9,9 +9,8 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.client.Minecraft;
+import mezz.jei.common.Internal;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
 
 @JeiPlugin
@@ -36,17 +35,15 @@ public class PluginJEI implements IModPlugin {
     registry.addRecipeCategories(new TrapCatalyst(guiHelper));
   }
 
-  // Full Recipe objects are no longer synced to the client at all (only recipe-book display data is).
-  // Reading the local integrated server's RecipeManager directly is the only way to get real recipe
-  // instances here; this only works in singleplayer/LAN-hosted worlds, so a JEI-connected dedicated-server
-  // client simply won't see these categories populated.
+  // Full Recipe objects are no longer synced to the client via vanilla's own protocol (only recipe-book
+  // display data is). JEI fills that gap itself: when JEI is installed on the server with a matching mod
+  // loader, it syncs the full RecipeManager - every recipe type, not just vanilla's - into a client-side
+  // RecipeMap.
+  // TODO: probably change this if Internal.getClientSyncedRecipes ever gets access in jei's-API
   @Override
   public void registerRecipes(IRecipeRegistration registry) {
-    MinecraftServer server = Minecraft.getInstance().getSingleplayerServer();
-    if (server == null) {
-      return;
-    }
-    registry.addRecipes(ExplosionCatalyst.TYPE, List.copyOf(server.getRecipeManager().recipeMap().byType(CreeperRegistry.EXPLOSION_RECIPE.get()).stream().map(h -> h.value()).toList()));
-    registry.addRecipes(TrapCatalyst.TYPE, List.copyOf(server.getRecipeManager().recipeMap().byType(CreeperRegistry.TRAP_RECIPE.get()).stream().map(h -> h.value()).toList()));
+    var clientSyncedRecipes = Internal.getClientSyncedRecipes();
+    registry.addRecipes(ExplosionCatalyst.TYPE, List.copyOf(clientSyncedRecipes.byType(CreeperRegistry.EXPLOSION_RECIPE.get()).stream().map(h -> h.value()).toList()));
+    registry.addRecipes(TrapCatalyst.TYPE, List.copyOf(clientSyncedRecipes.byType(CreeperRegistry.TRAP_RECIPE.get()).stream().map(h -> h.value()).toList()));
   }
 }
